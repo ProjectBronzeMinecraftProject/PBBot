@@ -1,2 +1,2 @@
 # PBBot
-Pro
+ProjectBronze bot written using JDA libary
