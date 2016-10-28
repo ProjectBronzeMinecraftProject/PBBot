@@ -32,6 +32,7 @@ public class Core implements IBot
 		processArgs(args);
 		try
 		{
+			System.out.println("asd");
 			err = new LogStream(System.err);
 			log = new LogStream(System.out);
 			bot = new JDABuilder().setBotToken(NohubConst.TOKEN).setEventManager(new AnnotatedEventManager()).addListener(new Core()).setBulkDeleteSplittingEnabled(false).buildBlocking();
