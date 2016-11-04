@@ -8,11 +8,13 @@ import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+
 import com.gt22.jdaenchacer.command.Command;
+import com.gt22.jdaenchacer.data.AdvUser;
 import com.projectbronze.pbbot.Core;
-import com.projectbronze.pbbot.data.AdvUser;
 import com.projectbronze.pbbot.music.MusicHandler;
 import com.projectbronze.pbbot.utils.comporator.FileComporatorDir;
+
 import net.dv8tion.jda.entities.Guild;
 import net.dv8tion.jda.entities.User;
 
@@ -80,12 +82,12 @@ public class FormatUtils
 	{
 		Object play = MusicHandler.playlistGet(pos);
 		String name = play instanceof File ? ((File) play).getPath() : play instanceof URL ? play.toString() : "Cannot read";
-		return (pos + 1) + ": " + (play instanceof File ? name.replace('\\', '/').substring(name.indexOf('/') + 1, name.lastIndexOf('.')) : name) + '\n';
+		return (pos + 1) + ": " + (play instanceof File ? name.substring(name.indexOf(File.separatorChar) + 1, name.lastIndexOf('.')).replace('\\', '/') : name) + '\n';
 	}
 
 	public static String formatPlaylist()
 	{
-		String ret = "command.format.playlist.title";
+		String ret = "Плэйлист:\n```";
 		int size = MusicHandler.playlistSize();
 		for (int i = 0; i < size; i++)
 		{

@@ -1,7 +1,8 @@
 package com.projectbronze.pbbot.utils;
 
 import com.gt22.jdaenchacer.command.Command;
-import com.projectbronze.pbbot.data.AdvUser;
+import com.gt22.jdaenchacer.data.AdvUser;
+
 import net.dv8tion.jda.JDA;
 import net.dv8tion.jda.entities.User;
 

@@ -1,9 +1,11 @@
 package com.projectbronze.pbbot;
 
 import java.util.List;
-import com.projectbronze.pbbot.data.AdvGuild;
-import com.projectbronze.pbbot.data.AdvUser;
+
+import com.gt22.jdaenchacer.data.AdvGuild;
+import com.gt22.jdaenchacer.data.AdvUser;
 import com.projectbronze.pbbot.music.MusicHandler;
+
 import net.dv8tion.jda.entities.Guild;
 
 public class ShutdonHook

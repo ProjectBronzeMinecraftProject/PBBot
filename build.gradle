@@ -19,7 +19,8 @@ repositories {
 
 sourceSets {
     main {
-        java { srcDirs = ["$projectDir/java"] }\
+        java { srcDirs = ["$projectDir/java"] }
+		resources { srcDirs = ["$projectDir/resources"] }
     }
 }
 

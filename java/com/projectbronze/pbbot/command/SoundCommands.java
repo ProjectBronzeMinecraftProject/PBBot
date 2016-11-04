@@ -82,22 +82,26 @@ public class SoundCommands implements ICommandList{
 						{
 							case ("*"):
 							{
-								if (args.length < i)
+								System.out.println(args.length - 1 + "<" + i);
+								if (args.length > i + 1)
+								{
+									try
+									{
+										count = Integer.parseInt(args[i + 1]);
+										skipArg = true;
+									}
+									catch (NumberFormatException e)
+									{
+										reply(msg, "Введено не правильное количество песен");
+										return;
+									}
+									break;
+								}
+								else
 								{
 									reply(msg, "Укажите количество");
 									return;
 								}
-								try
-								{
-									count = Integer.parseInt(args[i + 1]);
-									skipArg = true;
-								}
-								catch (NumberFormatException e)
-								{
-									reply(msg, "Введено не правильное количество песен");
-									return;
-								}
-								break;
 							}
 							case ("-a"):
 							case ("--all"):
@@ -158,7 +162,7 @@ public class SoundCommands implements ICommandList{
 							break;
 						}
 					}
-				}, (msg, args, guild) -> reply(msg, "Не буду я тебя слущать."), 30),
+				}, (msg, args, guild) -> reply(msg, "Не буду я тебя слушать."), 30),
 				/*createCommand("пауза", "пз", "Останавливает музыку", (msg, args, guild) ->
 				{
 					if (MusicHandler.getState() != State.PLAYING)

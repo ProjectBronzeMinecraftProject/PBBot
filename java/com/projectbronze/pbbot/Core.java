@@ -1,15 +1,20 @@
 package com.projectbronze.pbbot;
 
+import java.io.PrintStream;
+import java.util.Arrays;
+
 import com.gt22.jdaenchacer.command.CommandManager;
+import com.gt22.jdaenchacer.command.CommandManager.ExecuteResult;
+import com.gt22.jdaenchacer.data.AdvGuild;
+import com.gt22.jdaenchacer.data.AdvUser;
 import com.projectbronze.botlauncher.api.IBot;
 import com.projectbronze.pbbot.command.Commands;
 import com.projectbronze.pbbot.console.ConsoleReader;
-import com.projectbronze.pbbot.data.AdvGuild;
-import com.projectbronze.pbbot.data.AdvUser;
 import com.projectbronze.pbbot.log.LogStream;
 import com.projectbronze.pbbot.nohub.NohubConst;
 import com.projectbronze.pbbot.utils.Constants;
 import com.projectbronze.pbbot.utils.LevelUtils;
+
 import net.dv8tion.jda.JDA;
 import net.dv8tion.jda.JDABuilder;
 import net.dv8tion.jda.entities.Guild;
@@ -25,16 +30,23 @@ public class Core implements IBot
 {
 	public static JDA bot;
 	public static boolean debug = false;
+	public static PrintStream info;
 	public static LogStream log, err;
-	public static CommandManager commands = new CommandManager(LevelUtils::canUse, "!");
+	public static CommandManager commands = new CommandManager(LevelUtils::canUse, "!", (cm, args, sender) -> info.printf("Выполняется команда %s с аргументами %s\n", cm.name, Arrays.toString(args)));
 	public static void main(String[] args)
 	{
 		processArgs(args);
 		try
 		{
+			if(info == null)
+			{
+				info = System.out;
+			}
 			err = new LogStream(System.err);
 			log = new LogStream(System.out);
-			bot = new JDABuilder().setBotToken(NohubConst.TOKEN).setEventManager(new AnnotatedEventManager()).addListener(new Core()).setBulkDeleteSplittingEnabled(false).buildBlocking();
+			info.println("Бот запукается");
+			info.flush();
+			bot = new JDABuilder().setBotToken(NohubConst.TOKEN).setEventManager(new AnnotatedEventManager()).addListener(new Core()).setBulkDeleteSplittingEnabled(false).buildAsync();
 		}
 		catch (Exception e)
 		{
@@ -86,7 +98,9 @@ public class Core implements IBot
 	{
 		JDA bot = e.getJDA();
 		Commands.init();
+		info.println("Добавлены команды");
 		LevelUtils.addDefaultAdmins(bot);
+		info.println("Добавлены стандартные админы");
 		ConsoleReader.init();
 		bot.getVoiceChannels().parallelStream().filter(ch -> ch.getUsers().parallelStream().anyMatch(LevelUtils::isFullAdmin)).findFirst().ifPresent(chan -> chan.getGuild().getAudioManager().openAudioConnection(chan));
 		bot.getAccountManager().setGame("!команды");
@@ -116,7 +130,10 @@ public class Core implements IBot
 			}
 			checkIfDepartured(msg, usr, guild.base);
 			if (text.startsWith(botMention)) {
-				commands.tryExecuteCommand(text, msg, usr, guild.base);
+				if(commands.tryExecuteCommand(text, msg, usr, guild.base) == ExecuteResult.NO_SUCH_COMMNAD)
+				{
+					reply(msg, "Не вижу у себя в оперативке такой комманды");
+				}
 			}
 		} catch (Exception ex) {
 			handleCriticalError(e.getMessage(), ex);
@@ -147,8 +164,9 @@ public class Core implements IBot
 	}
 
 	@Override
-	public void start()
+	public void start(PrintStream infoStream)
 	{
+		info = infoStream;
 		main(new String[]{});
 	}
 

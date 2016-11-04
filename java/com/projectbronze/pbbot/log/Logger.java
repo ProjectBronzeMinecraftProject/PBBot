@@ -3,7 +3,8 @@ package com.projectbronze.pbbot.log;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import com.projectbronze.pbbot.utils.FileUtils;
+
+import com.gt22.jdaenchacer.utils.FileUtils;	
 
 class Logger
 {

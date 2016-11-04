@@ -1,15 +1,17 @@
 package com.projectbronze.pbbot.command;
 
 import static com.projectbronze.pbbot.Core.reply;
-import java.io.Serializable;
+
 import java.util.Arrays;
 import java.util.List;
+
 import com.gt22.jdaenchacer.command.Command;
 import com.gt22.jdaenchacer.command.ICommandList;
+import com.gt22.jdaenchacer.data.AdvGuild;
 import com.projectbronze.pbbot.Core;
-import com.projectbronze.pbbot.data.AdvGuild;
 import com.projectbronze.pbbot.utils.MiscUtils;
 import com.projectbronze.pbbot.utils.Wrapper;
+
 import net.dv8tion.jda.entities.TextChannel;
 
 public class GuildCommands implements ICommandList

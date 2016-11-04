@@ -241,12 +241,14 @@ public class MusicHandler
 						if (o instanceof File)
 						{
 							p = new FilePlayer((File) o);
-							Core.bot.getAccountManager().setGame(((File) o).getName());
+							String file = ((File) o).getName();
+							Core.bot.getAccountManager().setGame(file.substring(0, file.lastIndexOf('.')));
 						}
 						else if (o instanceof URL)
 						{
 							p = new URLPlayer(guild.getJDA(), (URL) o);
-							Core.bot.getAccountManager().setGame(((URL) o).getFile());
+							String file = ((URL) o).getFile();
+							Core.bot.getAccountManager().setGame(file.substring(0, file.lastIndexOf('.')));
 						}
 						else
 						{
