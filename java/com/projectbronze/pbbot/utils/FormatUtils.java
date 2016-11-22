@@ -23,23 +23,23 @@ public class FormatUtils
 
 	public static String formatHelp()
 	{
-		String ret = "";
+		String ret = "```";
 		List<Command> commands = Core.commands.getCommands();
 		for (Command cm : commands)
 		{
 			ret += String.format("• %s,\n", cm.name);
 		}
-		return String.format("Команды:\n%s", ret);
+		return String.format("Команды:\n%s", ret + "```");
 	}
 
 	public static String formatHelp(Command cm)
 	{
 		return String.format(
-				  "Комманда %s:\n"
+				  "```Комманда %s:\n"
 				+ "Короткое имя: %s\n"
 				+ "%s\n"
 				+ "Синтаксис: %s\n"
-				+ "Требуемый уровень: %s\n",
+				+ "Требуемый уровень: %s\n```",
 				cm.name, cm.shortname, cm.desc, cm.syntax, cm.level);
 	}
 
@@ -111,12 +111,13 @@ public class FormatUtils
 		String nick = guild.getNicknameForUser(usr);
 		int lvl = LevelUtils.getLevel(usr);
 		return String.format(
-				  "Информация о: %s"
-				+ "Псевдоним: %s"
-				+ "Статус: %s"
-				+ "Определитель: %s"
-				+ "Статус: %s",
-				usr.getUsername(), nick == null ? "Отсутствует" : nick, (lvl < 0 ? "Заблокированый" : lvl == 0 ? "Пользователь" : "Админ#" + lvl), usr.getId(), usr.getDiscriminator(), usr.getOnlineStatus());
+				  "```Информация о: %s\n"
+				+ "Псевдоним: %s\n"
+				+ "Статус: %s\n"
+				+ "Определитель: %s\n"
+				+ "ID: %s\n"
+				+ "Статус: %s\n```",
+				usr.getUsername(), nick == null ? "Отсутствует" : nick, (lvl < 0 ? "Заблокированый" : lvl == 0 ? "Пользователь" : "Админ#" + lvl), usr.getDiscriminator(), usr.getId(), usr.getOnlineStatus());
 	}
 
 	public static String formatBash(Random r)

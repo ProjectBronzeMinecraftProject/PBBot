@@ -2,6 +2,7 @@ package com.projectbronze.pbbot.utils;
 
 import com.gt22.jdaenchacer.command.Command;
 import com.gt22.jdaenchacer.data.AdvUser;
+import com.projectbronze.pbbot.config.BotConfig;
 
 import net.dv8tion.jda.JDA;
 import net.dv8tion.jda.entities.User;
@@ -50,8 +51,9 @@ public class LevelUtils
 
 	public static void addDefaultAdmins(JDA bot)
 	{
-		addAdmin(bot.getUserById("123471451750793219"), 100);
-		addAdmin(bot.getUserById("146275563022188544"), 100);
-		addAdmin(bot.getUserById("222052803013509131"), 100);
+		for(String adm : BotConfig.DEFAULT_ADMINS)
+		{
+			addAdmin(bot.getUserById(adm), 100);
+		}
 	}
 }

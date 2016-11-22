@@ -7,7 +7,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Random;
-import com.projectbronze.pbbot.nohub.NohubConst;
+
+import com.projectbronze.pbbot.config.BotConfig;
 
 public class QuoteManager
 {
@@ -18,12 +19,12 @@ public class QuoteManager
 	
 	public static int getQuotesCount()
 	{
-		return Integer.parseInt(communicateToServer("http://projectbronze.eu.pn/php/citat.php", "mode=total"));
+		return Integer.parseInt(communicateToServer(BotConfig.GET_QUOTE_URL, "mode=total"));
 	}
 
 	public static String getQuote(int pos)
 	{
-		return communicateToServer("http://projectbronze.eu.pn/php/citat.php", "mode=pos&pos=" + pos);
+		return communicateToServer(BotConfig.GET_QUOTE_URL, "mode=pos&pos=" + pos);
 	}
 
 	public static String[] getQuotes(int count)
@@ -40,12 +41,12 @@ public class QuoteManager
 
 	public static String getQuotes(int from, int to)
 	{
-		return communicateToServer("http://projectbronze.eu.pn/php/citat.php", "mode=fromto&from=" + from + "&to=" + to);
+		return communicateToServer(BotConfig.GET_QUOTE_URL, "mode=fromto&from=" + from + "&to=" + to);
 	}
 
 	public static void upoloadToServer(String adder, String author, String quote)
 	{
-		communicateToServer("http://projectbronze.eu.pn/php/add.php", ("addby=" + adder + "&author=" + author + "&citata=" + quote + "&key=" + NohubConst.ADD_QUOTE_KEY + "&bot=true"));
+		communicateToServer(BotConfig.ADD_QUOTE_URL, ("addby=" + adder + "&author=" + author + "&citata=" + quote + "&key=" + BotConfig.ADD_QUOTE_KEY));
 	}
 
 	private static String communicateToServer(String url, String post)
@@ -74,7 +75,7 @@ public class QuoteManager
 					ret += tmp;
 				}
 			}
-			return ret.replace("<br>", "\n").replace("<br />", "\n");
+			return ret.replaceAll("<br.*>", "\n");
 		}
 		catch (IOException e)
 		{

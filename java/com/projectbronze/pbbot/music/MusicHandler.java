@@ -51,10 +51,7 @@ public class MusicHandler
 			{
 				if (all)
 				{
-					MiscUtils.forEachFileInDir(music, (m) ->
-					{
-						playlist.add(m);
-					});
+					MiscUtils.forEachFileInDir(music, playlist::add);
 					if (getState() == State.EMPTY)
 					{
 						setState(State.STOPPED);

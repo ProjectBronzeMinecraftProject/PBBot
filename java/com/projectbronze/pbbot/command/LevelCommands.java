@@ -39,10 +39,20 @@ public class LevelCommands implements ICommandList
 					}
 					try
 					{
-						int level = Integer.parseInt(args[1]);
+						int level = Integer.parseInt(args[1]), senderLevel = LevelUtils.getLevel(msg.getAuthor());
 						if (level < 1)
 						{
 							reply(msg, "Что это за админ с допуском ниже 1???");
+							return;
+						}
+						if(level > senderLevel)
+						{
+							reply(msg, "Ты не достоин таких крутых админов добавлять");
+							return;
+						}
+						if(LevelUtils.getLevel(usr) >= senderLevel)
+						{
+							reply(msg, "Не дам управлять теми кто круче тебя");
 							return;
 						}
 						LevelUtils.addAdmin(usr, level);
@@ -54,8 +64,8 @@ public class LevelCommands implements ICommandList
 					reply(msg, usr.getUsername() + "#" + usr.getDiscriminator() + " теперь админ");
 				}, (msg, args, guild) ->
 				{
-					reply(msg, "Ты не на столько админ чтобы админов добовлять");
-				}, 100),
+					reply(msg, "Ты сам не админ, а других пытаешся добавить?");
+				}, 1),
 				createCommand("админ-", "адм-", "Убирает администратора", "<Имя|ID>", (msg, args, guild) ->
 				{
 					User usr = null;

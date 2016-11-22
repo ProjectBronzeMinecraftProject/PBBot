@@ -82,7 +82,6 @@ public class SoundCommands implements ICommandList{
 						{
 							case ("*"):
 							{
-								System.out.println(args.length - 1 + "<" + i);
 								if (args.length > i + 1)
 								{
 									try
@@ -246,17 +245,17 @@ public class SoundCommands implements ICommandList{
 					}
 					try {
 						for (String s : args) {
-							if (s.matches("^-*\\d*:-*\\d*$")) {
+							if (s.matches("^-?!\\d*:-?\\d*$")) {
 								String[] ends = s.split(":");
 								int lend;
 								int rend;
-								if (s.matches("^-*\\d+:-*\\d+$")) {
+								if (s.matches("^-?\\d+:-?\\d+$")) {
 									lend = Integer.parseInt(ends[0]) - 1;
 									rend = Integer.parseInt(ends[1]);
-								} else if (s.matches("^\\s*:-*\\d+$")) {
+								} else if (s.matches("^\\s*:-?\\d+$")) {
 									lend = 0;
 									rend = Integer.parseInt(ends[1]);
-								} else if (s.matches("^-*\\d+:$")) {
+								} else if (s.matches("^-?\\d+:$")) {
 									lend = Integer.parseInt(ends[0]) - 1;
 									rend = MusicHandler.playlistSize();
 								} else {

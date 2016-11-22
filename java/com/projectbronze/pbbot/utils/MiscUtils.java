@@ -15,8 +15,10 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
+
 import com.projectbronze.pbbot.Core;
-import com.projectbronze.pbbot.nohub.NohubConst;
+import com.projectbronze.pbbot.config.BotConfig;
+
 import net.dv8tion.jda.entities.Guild;
 import net.dv8tion.jda.entities.TextChannel;
 import net.dv8tion.jda.entities.User;
@@ -70,7 +72,7 @@ public class MiscUtils
 		byte[] post;
 		try
 		{
-			post = ("api_dev_key=" + NohubConst.PASTEBINKEY + "&api_paste_code=" + URLEncoder.encode(paste, "UTF-8") + "&api_paste_private=" + 1 + "&api_paste_name=" + URLEncoder.encode(name, "UTF-8") + "&api_option=paste&api_paste_expire_date=10M").getBytes(StandardCharsets.UTF_8);
+			post = ("api_dev_key=" + BotConfig.PASTEBIN_KEY + "&api_paste_code=" + URLEncoder.encode(paste, "UTF-8") + "&api_paste_private=" + 1 + "&api_paste_name=" + URLEncoder.encode(name, "UTF-8") + "&api_option=paste&api_paste_expire_date=10M").getBytes(StandardCharsets.UTF_8);
 
 			HttpURLConnection conn = (HttpURLConnection) pastebinURL.openConnection();
 			conn.setDoOutput(true);

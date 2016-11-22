@@ -1,0 +1,30 @@
+{
+	"token": "https://discordapp.com/developers/applications/me",
+	"pastebinKey": "http://pastebin.com/api",
+	"quotes": {
+		"INFO": "This is required for quote manager, it created to use with POST interface, to addQuoteURL it will send: addby=WhoAddedAQuote&author=WhoSaidTheQuote&quote=TheQuoteItself&key=addQuoteKey",
+		"INFO2": "to getQuoteURL it will send mode=MODE&modeparams=SeeAboutModes",
+		"INFO-MODES": {
+			"pos": {
+				"INFO": "Get the quote at specified position",
+				"ARGS": "pos=TheQuotePosition"
+			},
+			"total": {
+				"INFO": "Get the count of quotes",
+				"ARGS": "None"
+			},
+			"fromto": {
+				"INFO": "Returns all quotes starting from 'from' arg to 'to' arg",
+				"ARGS": "from=FROM&to=TO"
+			}
+		},
+		"addQuoteKey": "SecutrityKey",
+		"addQuoteURL": "http://someURL.com/php/addQuote.php",
+		"getQuoteURL": "http://someURL.com/php/getQuote.php"
+	},
+	"defaultAdmins": [
+		"YourID",
+		"BotID",
+		"SomeoneID"
+	]
+}

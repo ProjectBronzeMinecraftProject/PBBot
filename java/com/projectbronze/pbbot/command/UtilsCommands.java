@@ -218,7 +218,17 @@ public class UtilsCommands implements ICommandList
 					{
 						msg.getChannel().sendMessage(FormatUtils.formatBash(r));
 					}
-				})
+				}),
+				createCommand("скажи", "say", "Боты отправляет в чат аргументы этой команды", "[что, сказать, боту]", (msg, args, guild) -> {
+					String rep = "";
+					for(String s : args)
+					{
+						rep += s;
+					}
+					msg.getChannel().sendMessage(rep);
+				}, (msg, args, guild) -> {
+					reply(msg, "Ну неееет.");
+				}, 100)
 		});
 	}
 }
