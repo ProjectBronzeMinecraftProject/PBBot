@@ -11,7 +11,6 @@ import com.gt22.jdaenchacer.data.AdvUser;
 import com.projectbronze.botlauncher.api.IBot;
 import com.projectbronze.pbbot.command.Commands;
 import com.projectbronze.pbbot.config.BotConfig;
-import com.projectbronze.pbbot.console.ConsoleReader;
 import com.projectbronze.pbbot.log.LogStream;
 import com.projectbronze.pbbot.utils.Constants;
 import com.projectbronze.pbbot.utils.LevelUtils;
@@ -33,7 +32,7 @@ public class Core implements IBot {
 	public static boolean debug = false;
 	public static PrintStream info;
 	public static LogStream log, err;
-	public static CommandManager commands = new CommandManager(LevelUtils::canUse, "!", (cm, args, sender) -> info.printf("Выполняется команда %s с аргументами %s\n", cm.name, Arrays.toString(args)));
+	public static CommandManager commands = new CommandManager(LevelUtils::canUse, "!", (cm, args, sender) -> info.println(String.format("Выполняется команда %s с аргументами %s", cm.name, Arrays.toString(args))));
 	public static final Gson gson = com.projectbronze.botlauncher.Core.gson;
 	public static void main(String[] args) {
 		processArgs(args);
@@ -89,7 +88,7 @@ public class Core implements IBot {
 		info.println("Добавлены команды");
 		LevelUtils.addDefaultAdmins(bot);
 		info.println("Добавлены стандартные админы");
-		ConsoleReader.init();
+		//ConsoleReader.init();
 		bot.getVoiceChannels().parallelStream().filter(ch -> ch.getUsers().parallelStream().anyMatch(LevelUtils::isFullAdmin)).findFirst().ifPresent(ch -> {
 			AudioManager m = ch.getGuild().getAudioManager();
 			if (m.isAttemptingToConnect() || m.isAttemptingToConnect()) {
@@ -108,6 +107,10 @@ public class Core implements IBot {
 			Message msg = e.getMessage();
 			User usr = msg.getAuthor();
 			String text = msg.getContent();
+			if(usr == null)
+			{
+				return;//Webhooks
+			}
 			if (LevelUtils.getLevel(usr) < 0) {
 				msg.deleteMessage();
 				return;

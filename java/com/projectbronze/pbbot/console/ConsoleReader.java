@@ -7,9 +7,10 @@ import com.projectbronze.pbbot.utils.Constants;
 
 public class ConsoleReader
 {
+	public static Thread reader;
 	public static void init()
 	{
-		new Thread(() ->
+		(reader = new Thread(() ->
 		{
 			ConsoleCommands.init();
 			BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
@@ -38,7 +39,7 @@ public class ConsoleReader
 					e.printStackTrace();
 				}
 			}
-		}).start();
+		}, "PBBot console reader")).start();
 		;
 	}
 }

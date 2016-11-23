@@ -29,7 +29,7 @@ public class FormatUtils
 		{
 			ret += String.format("• %s,\n", cm.name);
 		}
-		return String.format("Команды:\n%s", ret + "```");
+		return MiscUtils.uploadToPastebin(String.format("Команды:\n%s", ret + "```"), "Команды");
 	}
 
 	public static String formatHelp(Command cm)
