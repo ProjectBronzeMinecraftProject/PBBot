@@ -2,6 +2,7 @@ package com.projectbronze.pbbot;
 
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.Random;
 
 import com.google.gson.Gson;
 import com.gt22.jdaenchacer.command.CommandManager;
@@ -34,6 +35,7 @@ public class Core implements IBot {
 	public static LogStream log, err;
 	public static CommandManager commands = new CommandManager(LevelUtils::canUse, "!", (cm, args, sender) -> info.println(String.format("Выполняется команда %s с аргументами %s", cm.name, Arrays.toString(args))));
 	public static final Gson gson = com.projectbronze.botlauncher.Core.gson;
+	public static final Random rand = new Random();
 	public static void main(String[] args) {
 		processArgs(args);
 		try {
@@ -97,6 +99,7 @@ public class Core implements IBot {
 			m.openAudioConnection(ch);
 		});
 		bot.getAccountManager().setGame("!команды");
+		info.println("Бот готов");
 	}
 
 	public static final String botMention = "!";

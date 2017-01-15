@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Random;
 
+import com.projectbronze.pbbot.Core;
 import com.projectbronze.pbbot.config.BotConfig;
 
 public class QuoteManager
@@ -30,7 +31,7 @@ public class QuoteManager
 	public static String[] getQuotes(int count)
 	{
 		int size = getQuotesCount();
-		Random r = new Random();
+		Random r = Core.rand;
 		String[] ret = new String[count];
 		for (int i = 0; i < count; i++)
 		{

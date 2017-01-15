@@ -15,6 +15,9 @@ import com.projectbronze.pbbot.Core;
 import com.projectbronze.pbbot.music.MusicHandler;
 import com.projectbronze.pbbot.utils.comporator.FileComporatorDir;
 
+import net.dv8tion.jda.audio.player.FilePlayer;
+import net.dv8tion.jda.audio.player.Player;
+import net.dv8tion.jda.audio.player.URLPlayer;
 import net.dv8tion.jda.entities.Guild;
 import net.dv8tion.jda.entities.User;
 
@@ -80,9 +83,9 @@ public class FormatUtils
 
 	public static String formatSong(int pos)
 	{
-		Object play = MusicHandler.playlistGet(pos);
-		String name = play instanceof File ? ((File) play).getPath() : play instanceof URL ? play.toString() : "Cannot read";
-		return (pos + 1) + ": " + (play instanceof File ? name.substring(name.indexOf(File.separatorChar) + 1, name.lastIndexOf('.')).replace('\\', '/') : name) + '\n';
+		Player play = MusicHandler.playlistGet(pos);
+		String name = play instanceof FilePlayer ? MusicHandler.getFileFromPlayer(((FilePlayer) play)).getPath() : play instanceof URLPlayer ? MusicHandler.getURLFromPlayer((URLPlayer) play).toString() : "Cannot read";
+		return (pos + 1) + ": " + (play instanceof FilePlayer ? name.substring(name.indexOf(File.separatorChar) + 1, name.lastIndexOf('.')).replace('\\', '/') : name) + '\n';
 	}
 
 	public static String formatPlaylist()

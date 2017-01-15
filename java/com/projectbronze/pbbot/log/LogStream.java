@@ -8,7 +8,7 @@ import com.projectbronze.pbbot.Core;
 
 public class LogStream extends PrintStream {
 	public LogStream(PrintStream out) throws IOException {
-		super(out);
+		super(out, true, "UTF-8");
 		Logger.init();
 	}
 

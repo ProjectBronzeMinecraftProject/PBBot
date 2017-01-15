@@ -119,7 +119,7 @@ public class GuildCommands implements ICommandList
 						case SINGLE:
 						{
 							AdvGuild.of(guild).removeWhitelistedChannel(chan.single.get().getId());
-							reply(msg, "command.format.whitelist-.reply");
+							reply(msg, "Вайтлист с канала убран");
 							break;
 						}
 						case MULTI:
@@ -148,7 +148,7 @@ public class GuildCommands implements ICommandList
 						case SINGLE:
 						{
 							AdvGuild.of(guild).addBotonlyChannel(chan.single.get().getId());
-							reply(msg, "command.format.botonly+.reply");
+							reply(msg, "канал добавлен в список 'только для бота'");
 							break;
 						}
 						case MULTI:
@@ -176,7 +176,7 @@ public class GuildCommands implements ICommandList
 						case SINGLE:
 						{
 							AdvGuild.of(guild).removeBotonlyChannel(chan.single.get().getId());
-							reply(msg, "command.format.botonly-.reply");
+							reply(msg, "Канал убран из списка 'только для бота'");
 							break;
 						}
 						case MULTI:

@@ -17,12 +17,7 @@ public class BotConfig {
 	public static final String TOKEN, PASTEBIN_KEY, ADD_QUOTE_KEY, ADD_QUOTE_URL, GET_QUOTE_URL;
 	static {
 		try {
-			String jarDir = BotConfig.class.getProtectionDomain().getCodeSource().getLocation().getPath().replaceAll("%20", "\\ ");
-			if(jarDir.endsWith(".jar"))
-			{
-				jarDir = jarDir.substring(0, jarDir.lastIndexOf('/'));
-			}
-			CONFIG = new File(jarDir, "config.json");
+			CONFIG = new File("config.json");
 			Gson gson = Core.gson;
 			JsonObject cfg = new JsonParser().parse(new InputStreamReader(new FileInputStream(CONFIG))).getAsJsonObject();
 			DEFAULT_ADMINS = gson.fromJson(cfg.getAsJsonArray("defaultAdmins"), String[].class);

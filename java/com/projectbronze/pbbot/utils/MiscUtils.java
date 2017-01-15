@@ -23,57 +23,41 @@ import net.dv8tion.jda.entities.Guild;
 import net.dv8tion.jda.entities.TextChannel;
 import net.dv8tion.jda.entities.User;
 
-public class MiscUtils
-{
+public class MiscUtils {
 	private static final URL pastebinURL;
 
-	static
-	{
-		try
-		{
+	static {
+		try {
 			pastebinURL = new URL("http://pastebin.com/api/api_post.php");
-		}
-		catch (MalformedURLException e)
-		{
+		} catch (MalformedURLException e) {
 			e.printStackTrace(Core.err);
 			throw new RuntimeException();
 		}
 	}
 
-	public static String getArrayAsString(Object[] array, String format)
-	{
-		if (array.length == 0)
-		{
-			return "";
-		}
-		String ret = "";
-		for (Object o : array)
-		{
-			ret += o + format;
-		}
-		return ret.substring(0, ret.length() - format.length());
+	public static String getArrayAsString(Object[] array, String format) {
+		return Arrays.stream(array).map(Object::toString).reduce((s1, s2) -> s1 + format + s2).orElse("");
 	}
 
-	public static File getRandomFile(File md, Random r)
-	{
-		File music = md.listFiles()[r.nextInt(md.listFiles().length)];
-		if (music.isDirectory())
-		{
-			return getRandomFile(music, r);
+	public static File getRandomFile(File dir, Random r) {
+		if (dir.isFile()) {
+			return dir;
 		}
-		else
-		{
-			return music;
+		File[] files = dir.listFiles();
+		if (files == null) {
+			return null;
+		}
+		File file = files[r.nextInt(files.length)];
+		if (file.isDirectory()) {
+			return getRandomFile(file, r);
+		} else {
+			return file;
 		}
 	}
 
-	public static String uploadToPastebin(String paste, String name)
-	{
-		byte[] post;
-		try
-		{
-			post = ("api_dev_key=" + BotConfig.PASTEBIN_KEY + "&api_paste_code=" + URLEncoder.encode(paste, "UTF-8") + "&api_paste_private=" + 1 + "&api_paste_name=" + URLEncoder.encode(name, "UTF-8") + "&api_option=paste&api_paste_expire_date=10M").getBytes(StandardCharsets.UTF_8);
-
+	public static String uploadToPastebin(String paste, String name) {
+		try {
+			byte[] post = ("api_dev_key=" + BotConfig.PASTEBIN_KEY + "&api_paste_code=" + URLEncoder.encode(paste, "UTF-8") + "&api_paste_private=" + 1 + "&api_paste_name=" + URLEncoder.encode(name, "UTF-8") + "&api_option=paste&api_paste_expire_date=10M").getBytes(StandardCharsets.UTF_8);
 			HttpURLConnection conn = (HttpURLConnection) pastebinURL.openConnection();
 			conn.setDoOutput(true);
 			conn.setInstanceFollowRedirects(false);
@@ -82,126 +66,83 @@ public class MiscUtils
 			conn.setRequestProperty("charset", "utf-8");
 			conn.setRequestProperty("Content-Length", Integer.toString(post.length));
 			conn.setUseCaches(false);
-			try (DataOutputStream wr = new DataOutputStream(conn.getOutputStream()))
-			{
+			try (DataOutputStream wr = new DataOutputStream(conn.getOutputStream())) {
 				wr.write(post);
 			}
 			BufferedReader is = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
 			String response = "";
-			while (response == "")
-			{
+			while (response == "") {
 				response = is.readLine();
 			}
 			is.close();
 			return response;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace(Core.err);
 			return "UNABLETOUPLOAD";
 		}
 	}
 
-	public static boolean isInChannel(Guild guild)
-	{
-		return Core.bot.getAudioManager(guild).isConnected();
+	public static boolean isInChannel(Guild guild) {
+		return guild.getAudioManager().isConnected();
 	}
 
-	public static void forEachFileInDir(File dir, Consumer<File> action)
-	{
-		List<File> files = Arrays.asList(dir.listFiles());
-		for (File f : files)
-		{
-			if (f.isDirectory())
-			{
+	public static void forEachFileInDir(File dir, Consumer<File> action) {
+		if(dir.isFile()) {
+			action.accept(dir);
+		} else {
+			File[] files = dir.listFiles();
+			for(File f : dir.listFiles()) {
 				forEachFileInDir(f, action);
-			}
-			else
-			{
-				action.accept(f);
 			}
 		}
 	}
 
-	public static String getTime(SimpleDateFormat format)
-	{
+	public static String getTime(SimpleDateFormat format) {
 		return format.format(Calendar.getInstance().getTime());
 	}
 
-	public static boolean isInBount(int val, int min, int max)
-	{
+	public static boolean isInBount(int val, int min, int max) {
 		return min < val && val < max;
 	}
 
-	public static User getUser(String name, String discriminator)
-	{
-		return Core.bot.getUsersByName(name).stream().filter((user) -> user.getDiscriminator().equals(discriminator)).toArray(User[]::new)[0];
+	public static User getUser(String name, String discriminator) {
+		return Core.bot.getUsersByName(name).parallelStream().filter(user -> user.getDiscriminator().equals(discriminator)).findFirst().orElse(null);
 	}
 
-	
-	public static Wrapper<User> tryGetUser(String from)
-	{
+	public static Wrapper<User> tryGetUser(String from) {
 		User usr = Core.bot.getUserById(from);
-		if (usr == null)
-		{
-			if (from.contains("#") && !from.startsWith("#"))
-			{
+		if (usr == null) {
+			if (from.contains("#") && !from.startsWith("#")) {
 				String[] str = from.split("#");
-				usr = getUser(str[0], str[1]);
-				if (usr != null)
-				{
-					return new Wrapper<User>(usr);
-				}
-			}
-			else
-			{
-				if (from.startsWith("@"))
-				{
-					from = from.substring(1);
-				}
-				String f = from;
-				if(f.startsWith("#"))
-				{
+				return new Wrapper<User>(getUser(str[0], str[1]));
+			} else {
+				String f = from.startsWith("@") ? from.substring(1) : from;
+				if (f.startsWith("#")) {
 					return new Wrapper<User>(Core.bot.getUsers().parallelStream().filter(user -> user.getDiscriminator().equals(f.substring(1))).toArray(User[]::new));
-				}
-				else
-				{
+				} else {
 					List<User> users = Core.bot.getUsersByName(from);
 					return new Wrapper<User>(users.toArray(new User[users.size()]));
 				}
 			}
 		}
-		else
-		{
-			return new Wrapper<User>(usr);
-		}
-		return new Wrapper<User>();
+		return new Wrapper<User>(usr);
 	}
-	
-	public static Wrapper<TextChannel> tryGetChannel(String from, Guild guild)
-	{
+
+	public static Wrapper<TextChannel> tryGetChannel(String from, Guild guild) {
 		TextChannel chan = Core.bot.getTextChannelById(from);
-		if(chan == null)
-		{
+		if (chan == null) {
 			String t = from.startsWith("#") ? from.substring(1) : from;
-			List<TextChannel> chans = Core.bot.getTextChannelsByName(t);
-			if(chans.size() == 1)
-			{
-				return new Wrapper<TextChannel>(chans.get(0));
-			}
-			else if(guild != null)
-			{
+			if (guild != null) {
 				return new Wrapper<TextChannel>(guild.getTextChannels().parallelStream().filter(c -> c.getName().equals(t)).toArray(TextChannel[]::new));
-			}
-			else
-			{
-				return new Wrapper<TextChannel>(chans.toArray(new TextChannel[chans.size()]));
+			} else {
+				List<TextChannel> chans = Core.bot.getTextChannelsByName(t);
+				if (chans.size() == 1) {
+					return new Wrapper<TextChannel>(chans.get(0));
+				} else {
+					return new Wrapper<TextChannel>(chans.toArray(new TextChannel[chans.size()]));
+				}
 			}
 		}
-		else
-		{
-			return new Wrapper<TextChannel>(chan);
-		}
-		//return new Wrapper();
+		return new Wrapper<TextChannel>(chan);
 	}
 }

@@ -17,6 +17,15 @@ repositories {
     jcenter()
 }
 
+task builddep(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'com.projectbronze.pbot.Core'
+    }
+    baseName = "PBBot"
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
 sourceSets {
     main {
         java { srcDirs = ["$projectDir/java"] }
@@ -28,6 +37,7 @@ sourceSets {
 dependencies {
     // The production code uses the SLF4J logging API at compile time
     compile 'net.dv8tion:JDA:2.2.1_353'
+    compile 'org.jooq:jool:0.9.12'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
     // Declare the dependency for your favourite test framework you want to use in your tests.
     // TestNG is also supported by the Gradle Test task. Just change the
