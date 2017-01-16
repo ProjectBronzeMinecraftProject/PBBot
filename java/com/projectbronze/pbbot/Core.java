@@ -33,7 +33,8 @@ public class Core implements IBot {
 	public static boolean debug = false;
 	public static PrintStream info;
 	public static LogStream log, err;
-	public static CommandManager commands = new CommandManager(LevelUtils::canUse, "!", (cm, args, sender) -> info.println(String.format("Выполняется команда %s с аргументами %s", cm.name, Arrays.toString(args))));
+	public static final String botMention = "!";
+	public static CommandManager commands = new CommandManager(LevelUtils::canUse, botMention, (cm, args, sender) -> info.println(String.format("Performing command %s with args %s", cm.name, Arrays.toString(args))));
 	public static final Gson gson = com.projectbronze.botlauncher.Core.gson;
 	public static final Random rand = new Random();
 	public static void main(String[] args) {
@@ -44,7 +45,7 @@ public class Core implements IBot {
 			}
 			err = new LogStream(System.err);
 			log = new LogStream(System.out);
-			info.println("Бот запукается");
+			info.println("Starting bot");
 			info.flush();
 			bot = new JDABuilder().setBotToken(BotConfig.TOKEN).setEventManager(new AnnotatedEventManager()).addListener(new Core()).setBulkDeleteSplittingEnabled(false).buildAsync();
 		} catch (Exception e) {
@@ -87,22 +88,23 @@ public class Core implements IBot {
 	public void ready(ReadyEvent e) {
 		JDA bot = e.getJDA();
 		Commands.init();
-		info.println("Добавлены команды");
+		info.println("Commands added");
 		LevelUtils.addDefaultAdmins(bot);
-		info.println("Добавлены стандартные админы");
+		info.println("Default admins added");
 		//ConsoleReader.init();
 		bot.getVoiceChannels().parallelStream().filter(ch -> ch.getUsers().parallelStream().anyMatch(LevelUtils::isFullAdmin)).findFirst().ifPresent(ch -> {
 			AudioManager m = ch.getGuild().getAudioManager();
-			if (m.isAttemptingToConnect() || m.isAttemptingToConnect()) {
+			if (m.isAttemptingToConnect() || m.isConnected()) {
 				m.closeAudioConnection();
 			}
 			m.openAudioConnection(ch);
+			info.println(String.format("Found admin in channel %s:%s, connecting", ch.getGuild().getName(), ch.getName()));
 		});
-		bot.getAccountManager().setGame("!команды");
-		info.println("Бот готов");
+		bot.getAccountManager().setGame("!commands");
+		info.println("Bot launched");
 	}
 
-	public static final String botMention = "!";
+	
 
 	@SubscribeEvent
 	public void msg(MessageReceivedEvent e) {
