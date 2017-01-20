@@ -12,8 +12,7 @@ public class LogStream extends PrintStream {
 		Logger.init();
 	}
 
-	private static final String INFO = "[INFO] ", DEBUG = "[DEBUG] ", WARNING = "[WARNING] ", ERROR = "[ERROR] ",
-			FATAL = "[FATAL] ";
+	private static final String INFO = "[INFO] ", DEBUG = "[DEBUG] ", WARNING = "[WARNING] ", ERROR = "[ERROR] ", FATAL = "[FATAL] ";
 	private static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
 
 	private static String getTime() {
@@ -34,8 +33,12 @@ public class LogStream extends PrintStream {
 	@Override
 	@Deprecated
 	public void print(String s) {
-		Logger.log(s);
-		super.print(s);
+		if (Core.fileLogs) {
+			Logger.log(s);
+		}
+		if (Core.consoleLogs) {
+			super.print(s);
+		}
 	}
 
 	public void info(Object s) {

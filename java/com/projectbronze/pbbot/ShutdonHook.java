@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.gt22.jdaenchacer.data.AdvGuild;
 import com.gt22.jdaenchacer.data.AdvUser;
-import com.projectbronze.pbbot.music.MusicHandler;
 
 import net.dv8tion.jda.entities.Guild;
 
@@ -17,7 +16,6 @@ public class ShutdonHook
 	{
 		EXIT_CODE = code;
 		ex = cause;
-		MusicHandler.shutdown();
 		System.exit(code);
 	}
 	

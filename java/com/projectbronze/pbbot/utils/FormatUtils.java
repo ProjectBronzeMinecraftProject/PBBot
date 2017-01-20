@@ -14,10 +14,8 @@ import com.gt22.jdaenchacer.data.AdvUser;
 import com.projectbronze.pbbot.Core;
 import com.projectbronze.pbbot.music.MusicHandler;
 import com.projectbronze.pbbot.utils.comporator.FileComporatorDir;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-import net.dv8tion.jda.audio.player.FilePlayer;
-import net.dv8tion.jda.audio.player.Player;
-import net.dv8tion.jda.audio.player.URLPlayer;
 import net.dv8tion.jda.entities.Guild;
 import net.dv8tion.jda.entities.User;
 
@@ -81,20 +79,23 @@ public class FormatUtils
 		return ret;
 	}
 
-	public static String formatSong(int pos)
+	public static String formatSong(int pos, Guild g)
 	{
-		Player play = MusicHandler.playlistGet(pos);
-		String name = play instanceof FilePlayer ? MusicHandler.getFileFromPlayer(((FilePlayer) play)).getPath() : play instanceof URLPlayer ? MusicHandler.getURLFromPlayer((URLPlayer) play).toString() : "Cannot read";
-		return (pos + 1) + ": " + (play instanceof FilePlayer ? name.substring(name.indexOf(File.separatorChar) + 1, name.lastIndexOf('.')).replace('\\', '/') : name) + '\n';
+		AudioTrack track = MusicHandler.playlistGet(pos, g);
+		String name = track.getIdentifier();
+		if(name.startsWith(MusicHandler.musicDir.getPath())) {
+			name.substring(MusicHandler.musicDir.getPath().length());
+		}
+		return (pos + 1) + ": " + name.substring(0, name.lastIndexOf('.')).replace('\\', '/') + (pos == 0 ? " " + ((int) (track.getPosition() * 100 / track.getDuration())) + "%" : "") + '\n';
 	}
 
-	public static String formatPlaylist()
+	public static String formatPlaylist(Guild g)
 	{
 		String ret = "Плэйлист:\n```";
-		int size = MusicHandler.playlistSize();
+		int size = MusicHandler.playlistSize(g);
 		for (int i = 0; i < size; i++)
 		{
-			ret += formatSong(i);
+			ret += formatSong(i, g);
 		}
 		return ret + "```";
 	}

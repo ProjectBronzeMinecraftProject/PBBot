@@ -4,7 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import com.gt22.jdaenchacer.utils.FileUtils;	
+import com.gt22.jdaenchacer.utils.FileUtils;
+import com.projectbronze.pbbot.Core;	
 
 class Logger
 {
@@ -13,7 +14,7 @@ class Logger
 
 	public static void init() throws IOException
 	{
-		if (!inited)
+		if (!inited && Core.fileLogs)
 		{
 			logFolder = new File("Logs");
 			logFile = new File(logFolder, "BotLog-0.log");
