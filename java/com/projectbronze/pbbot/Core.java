@@ -7,32 +7,34 @@ import java.util.Random;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.gt22.jdaenchacer.MessageHelper;
 import com.gt22.jdaenchacer.command.CommandManager;
 import com.gt22.jdaenchacer.command.CommandManager.ExecuteResult;
 import com.gt22.jdaenchacer.data.AdvGuild;
 import com.gt22.jdaenchacer.data.AdvUser;
-import com.projectbronze.botlauncher.api.IBot;
-import com.projectbronze.botprotocol.Server;
 import com.projectbronze.pbbot.command.Commands;
 import com.projectbronze.pbbot.config.BotConfig;
 import com.projectbronze.pbbot.log.LogStream;
 import com.projectbronze.pbbot.music.MusicHandler;
 import com.projectbronze.pbbot.utils.Constants;
 import com.projectbronze.pbbot.utils.LevelUtils;
+import com.projectbronze.pbbot.utils.MiscUtils;
 
-import net.dv8tion.jda.JDA;
-import net.dv8tion.jda.JDABuilder;
-import net.dv8tion.jda.entities.Guild;
-import net.dv8tion.jda.entities.Message;
-import net.dv8tion.jda.entities.MessageChannel;
-import net.dv8tion.jda.entities.User;
-import net.dv8tion.jda.events.ReadyEvent;
-import net.dv8tion.jda.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.hooks.AnnotatedEventManager;
-import net.dv8tion.jda.hooks.SubscribeEvent;
-import net.dv8tion.jda.managers.AudioManager;
+import net.dv8tion.jda.core.AccountType;
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.events.ReadyEvent;
+import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.hooks.AnnotatedEventManager;
+import net.dv8tion.jda.core.hooks.SubscribeEvent;
+import net.dv8tion.jda.core.managers.AudioManager;
 
-public class Core implements IBot {
+
+public class Core/* implements IBot*/ {
 	public static JDA bot;
 	public static boolean debug = false, fileLogs = false, consoleLogs = false;
 	public static PrintStream info;
@@ -53,12 +55,12 @@ public class Core implements IBot {
 			try {
 				System.setOut(log);
 				System.setErr(err);
-			} catch(SecurityException e) {
+			} catch (SecurityException e) {
 				log.error("Unable to set output streams");
 			}
 			info.println("Starting bot");
 			info.flush();
-			bot = new JDABuilder().setBotToken(BotConfig.TOKEN).setEventManager(new AnnotatedEventManager()).addListener(new Core()).setBulkDeleteSplittingEnabled(false).buildAsync();
+			bot = new JDABuilder(AccountType.BOT).setToken(BotConfig.TOKEN).setEventManager(new AnnotatedEventManager()).addListener(new Core()).setBulkDeleteSplittingEnabled(false).buildAsync();
 		} catch (Exception e) {
 			e.printStackTrace(err != null && err.canLog() ? err : System.err);
 			exit(Constants.EXIT_EXCEPTION, e);
@@ -90,7 +92,7 @@ public class Core implements IBot {
 				case ("-md"): {
 					MusicHandler.musicDir = new File(args[++i]);
 					System.out.println(MusicHandler.musicDir);
-					if(!MusicHandler.musicDir.exists()) {
+					if (!MusicHandler.musicDir.exists()) {
 						System.out.println("Unable to find music dir");
 						System.exit(1);
 					}
@@ -98,7 +100,7 @@ public class Core implements IBot {
 				}
 			}
 		}
-		if(MusicHandler.musicDir == null) {
+		if (MusicHandler.musicDir == null) {
 			MusicHandler.musicDir = new File("Music");
 		}
 	}
@@ -107,12 +109,8 @@ public class Core implements IBot {
 		ShutdonHook.exit(code, cause);
 	}
 
-	public static void reply(MessageChannel cn, User sender, String text) {
-		cn.sendMessage(sender.getAsMention() + " " + text);
-	}
-
 	public static void reply(Message orig, String reply) {
-		reply(orig.getChannel(), orig.getAuthor(), reply);
+		MessageHelper.reply(orig, reply);
 	}
 
 	public static void reply(Message orig, String reply, Object... format) {
@@ -123,21 +121,21 @@ public class Core implements IBot {
 	public void ready(ReadyEvent e) {
 		JDA bot = e.getJDA();
 		Commands.init();
-		info.println("Commands added");
+		log.info("Commands added");
 		LevelUtils.addDefaultAdmins(bot);
-		info.println("Default admins added");
+		log.info("Default admins added");
 		// ConsoleReader.init();
-		bot.getVoiceChannels().parallelStream().filter(ch -> ch.getUsers().parallelStream().anyMatch(LevelUtils::isFullAdmin)).findFirst().ifPresent(ch -> {
+		bot.getVoiceChannels().parallelStream().filter(ch -> ch.getMembers().parallelStream().map(Member::getUser).anyMatch(LevelUtils::isFullAdmin)).findFirst().ifPresent(ch -> {
 			AudioManager m = ch.getGuild().getAudioManager();
 			if (m.isAttemptingToConnect() || m.isConnected()) {
 				m.closeAudioConnection();
 			}
 			m.openAudioConnection(ch);
-			info.println(String.format("Found admin in channel %s:%s, connecting", ch.getGuild().getName(), ch.getName()));
+			log.info(String.format("Found admin in channel %s:%s, connecting", ch.getGuild().getName(), ch.getName()));
 		});
-		bot.getAccountManager().setGame("!команды");
-		info.println("Bot launched");
-		Server.init();
+		MiscUtils.setGame("!команды");
+		log.info("Bot launched");
+		//Server.init();
 	}
 
 	@SubscribeEvent
@@ -156,13 +154,13 @@ public class Core implements IBot {
 			Guild g = e.getGuild();
 			if (g != null) {
 				AdvGuild guild = AdvGuild.of(e.getGuild());
-				if (guild.isBotonlyChannel(msg.getChannelId()) && msg.getAuthor() != Core.bot.getSelfInfo()) {
+				if (guild.isBotonlyChannel(msg.getChannel().getId()) && msg.getAuthor() != Core.bot.getSelfUser()) {
 					msg.deleteMessage();
 				}
-				if (guild.hasWhitelistedChannels() && !guild.isWhitelistedChannel(msg.getChannelId()) && !guild.isBotonlyChannel(msg.getChannelId()) || guild.isBlacklistedChannel(msg.getChannelId())) {
+				if (guild.hasWhitelistedChannels() && !guild.isWhitelistedChannel(msg.getChannel().getId()) && !guild.isBotonlyChannel(msg.getChannel().getId()) || guild.isBlacklistedChannel(msg.getChannel().getId())) {
 					return;
 				}
-				checkIfDepartured(msg, usr, guild.base);
+				checkIfDepartured(msg, guild.base.getMember(usr), guild.base);
 			}
 			if (text.startsWith(botMention)) {
 				if (commands.tryExecuteCommand(text, msg, usr, g) == ExecuteResult.NO_SUCH_COMMNAD) {
@@ -174,12 +172,12 @@ public class Core implements IBot {
 		}
 	}
 
-	private static void checkIfDepartured(Message msg, User usr, Guild guild) {
-		AdvUser uesr = AdvUser.of(usr);
+	private static void checkIfDepartured(Message msg, Member usr, Guild guild) {
+		AdvUser uesr = AdvUser.of(usr.getUser());
 		if (uesr.hasData("dep") && uesr.getTag("dep").getString("from").equals(guild.getId())) {
 			Core.reply(msg, "С возвращением");
 			uesr.removeData("dep");
-			guild.getManager().unmute(usr);
+			guild.getController().setMute(usr, false);
 		}
 	}
 
@@ -195,7 +193,7 @@ public class Core implements IBot {
 		}
 	}
 
-	@Override
+	/*@Override
 	public void start(PrintStream infoStream) {
 		info = infoStream;
 		main(new String[] {});
@@ -204,5 +202,5 @@ public class Core implements IBot {
 	@Override
 	public JDA getBot() {
 		return bot;
-	}
+	}*/
 }

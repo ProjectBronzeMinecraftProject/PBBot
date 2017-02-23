@@ -12,16 +12,17 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
 
 import com.projectbronze.pbbot.Core;
 import com.projectbronze.pbbot.config.BotConfig;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-import net.dv8tion.jda.entities.Guild;
-import net.dv8tion.jda.entities.TextChannel;
-import net.dv8tion.jda.entities.User;
+import net.dv8tion.jda.core.entities.Game;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.impl.GameImpl;
+
 
 public class MiscUtils {
 	private static final URL pastebinURL;
@@ -104,45 +105,15 @@ public class MiscUtils {
 	public static boolean isInBount(int val, int min, int max) {
 		return min < val && val < max;
 	}
-
-	public static User getUser(String name, String discriminator) {
-		return Core.bot.getUsersByName(name).parallelStream().filter(user -> user.getDiscriminator().equals(discriminator)).findFirst().orElse(null);
+	
+	public static void setTrackAsGame(AudioTrack track) {
+			String name = track.getIdentifier();
+			setGame(name.substring(name.lastIndexOf(File.separator) + 1, name.lastIndexOf('.')));
 	}
-
-	public static Wrapper<User> tryGetUser(String from) {
-		User usr = Core.bot.getUserById(from);
-		if (usr == null) {
-			if (from.contains("#") && !from.startsWith("#")) {
-				String[] str = from.split("#");
-				return new Wrapper<User>(getUser(str[0], str[1]));
-			} else {
-				String f = from.startsWith("@") ? from.substring(1) : from;
-				if (f.startsWith("#")) {
-					return new Wrapper<User>(Core.bot.getUsers().parallelStream().filter(user -> user.getDiscriminator().equals(f.substring(1))).toArray(User[]::new));
-				} else {
-					List<User> users = Core.bot.getUsersByName(from);
-					return new Wrapper<User>(users.toArray(new User[users.size()]));
-				}
-			}
-		}
-		return new Wrapper<User>(usr);
+	
+	public static void setGame(String game) {
+			System.out.println(game);
+			Core.bot.getPresence().setGame(new GameImpl(game, null, Game.GameType.DEFAULT));
 	}
-
-	public static Wrapper<TextChannel> tryGetChannel(String from, Guild guild) {
-		TextChannel chan = Core.bot.getTextChannelById(from);
-		if (chan == null) {
-			String t = from.startsWith("#") ? from.substring(1) : from;
-			if (guild != null) {
-				return new Wrapper<TextChannel>(guild.getTextChannels().parallelStream().filter(c -> c.getName().equals(t)).toArray(TextChannel[]::new));
-			} else {
-				List<TextChannel> chans = Core.bot.getTextChannelsByName(t);
-				if (chans.size() == 1) {
-					return new Wrapper<TextChannel>(chans.get(0));
-				} else {
-					return new Wrapper<TextChannel>(chans.toArray(new TextChannel[chans.size()]));
-				}
-			}
-		}
-		return new Wrapper<TextChannel>(chan);
-	}
+	
 }

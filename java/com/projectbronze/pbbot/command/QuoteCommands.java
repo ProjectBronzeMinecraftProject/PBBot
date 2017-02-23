@@ -28,7 +28,7 @@ public class QuoteCommands implements ICommandList
 						newargs[i - 1] = args[i];
 					}
 					args = newargs;
-					QuoteManager.add(author, msg.getAuthor().getUsername(), MiscUtils.getArrayAsString(args, " "));
+					QuoteManager.add(author, msg.getAuthor().getName(), MiscUtils.getArrayAsString(args, " "));
 					reply(msg, "Цитата добавлена");
 				}, (msg, args, guild) -> reply(msg, "Ты не достоин!!"), 100),
 				createCommand("цитату", "цит", "Показывает цитату", "[x:y]|[x:]|[:y]|[x]|[]", (msg, args, guild) ->

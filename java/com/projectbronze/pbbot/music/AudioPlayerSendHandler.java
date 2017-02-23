@@ -3,7 +3,7 @@ package com.projectbronze.pbbot.music;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 
-import net.dv8tion.jda.audio.AudioSendHandler;
+import net.dv8tion.jda.core.audio.AudioSendHandler;
 
 /**
  * This is a wrapper around AudioPlayer which makes it behave as an AudioSendHandler for JDA. As JDA calls canProvide

@@ -4,8 +4,9 @@ import com.gt22.jdaenchacer.command.Command;
 import com.gt22.jdaenchacer.data.AdvUser;
 import com.projectbronze.pbbot.config.BotConfig;
 
-import net.dv8tion.jda.JDA;
-import net.dv8tion.jda.entities.User;
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.entities.User;
+
 
 public class LevelUtils
 {

@@ -1,16 +1,20 @@
 package com.projectbronze.pbbot.command;
 
 import static com.projectbronze.pbbot.Core.reply;
+
 import java.util.Arrays;
 import java.util.List;
+
 import com.gt22.jdaenchacer.command.Command;
 import com.gt22.jdaenchacer.command.ICommandList;
+import com.gt22.jdaenchacer.getters.Getters;
+import com.gt22.jdaenchacer.getters.Wrapper;
+import com.gt22.jdaenchacer.getters.Wrapper.WrapperState;
+import com.projectbronze.pbbot.Core;
 import com.projectbronze.pbbot.utils.FormatUtils;
 import com.projectbronze.pbbot.utils.LevelUtils;
-import com.projectbronze.pbbot.utils.MiscUtils;
-import com.projectbronze.pbbot.utils.Wrapper;
-import com.projectbronze.pbbot.utils.Wrapper.WrapperState;
-import net.dv8tion.jda.entities.User;
+
+import net.dv8tion.jda.core.entities.User;
 
 public class LevelCommands implements ICommandList {
 
@@ -22,7 +26,7 @@ public class LevelCommands implements ICommandList {
 				return;
 			}
 			User usr = null;
-			Wrapper<User> users = MiscUtils.tryGetUser(args[0]);
+			Wrapper<User> users = Getters.getUser(args[0], Core.bot);
 			if (users.state == WrapperState.SINGLE) {
 				usr = users.single.get();
 			} else {
@@ -47,12 +51,12 @@ public class LevelCommands implements ICommandList {
 			} catch (NumberFormatException e) {
 				reply(msg, "Указан невозможный уровень");
 			}
-			reply(msg, usr.getUsername() + "#" + usr.getDiscriminator() + " теперь админ");
+			reply(msg, usr.getName() + "#" + usr.getDiscriminator() + " теперь админ");
 		}, (msg, args, guild) -> {
 			reply(msg, "Ты сам не админ, а других пытаешся добавить?");
 		}, 1), createCommand("админ-", "адм-", "Убирает администратора", "<Имя|ID>", (msg, args, guild) -> {
 			User usr = null;
-			Wrapper<User> users = MiscUtils.tryGetUser(args[0]);
+			Wrapper<User> users = Getters.getUser(args[0], Core.bot);
 			if (users.state == WrapperState.SINGLE) {
 				usr = users.single.get();
 			} else {
@@ -64,7 +68,7 @@ public class LevelCommands implements ICommandList {
 				return;
 			}
 			LevelUtils.removeAdmin(usr);
-			reply(msg, usr.getUsername() + "#" + usr.getDiscriminator() + " больше не админ");
+			reply(msg, usr.getName() + "#" + usr.getDiscriminator() + " больше не админ");
 		}, (msg, args, guild) -> {
 			reply(msg, "Не позволю админов трогать!");
 		}, 1), createCommand("заблокировать", "блок+", "Блокирует пользователя (Бот будет удалять его сообщения и не реагировать на его команды)", "<Имя|ID>", (msg, args, guild) -> {
@@ -73,7 +77,7 @@ public class LevelCommands implements ICommandList {
 				return;
 			}
 			User usr = null;
-			Wrapper<User> users = MiscUtils.tryGetUser(args[0]);
+			Wrapper<User> users = Getters.getUser(args[0], Core.bot);
 			if (users.state == WrapperState.SINGLE) {
 				usr = users.single.get();
 			} else {
@@ -84,14 +88,14 @@ public class LevelCommands implements ICommandList {
 				reply(msg, "Он слишком крут чтоб ты его мог заблокировать");
 			}
 			LevelUtils.block(usr);
-			reply(msg, usr.getUsername() + "#" + usr.getDiscriminator() + " теперь заблокирован");
+			reply(msg, usr.getName() + "#" + usr.getDiscriminator() + " теперь заблокирован");
 		}, (msg, args, guild) -> reply(msg, "Ты даже не админ а пытаешся людей блочить?"), 1), createCommand("разблокировать", "блок-", "Снимает блокировку с пользователя", "<Имя|ID>", (msg, args, guild) -> {
 			if (args.length == 0) {
 				reply(msg, "Вы не указали кого хотите разблокировать");
 				return;
 			}
 			User usr = null;
-			Wrapper<User> users = MiscUtils.tryGetUser(args[0]);
+			Wrapper<User> users = Getters.getUser(args[0], Core.bot);
 			if (users.state == WrapperState.SINGLE) {
 				usr = users.single.get();
 			} else {
@@ -99,7 +103,7 @@ public class LevelCommands implements ICommandList {
 				return;
 			}
 			LevelUtils.unblock(usr);
-			reply(msg, usr.getUsername() + "#" + usr.getDiscriminator() + " теперь разблокирован");
+			reply(msg, usr.getName() + "#" + usr.getDiscriminator() + " теперь разблокирован");
 		}, (msg, args, guild) -> reply(msg, "Не дам какому-то левому парню разблокировать людей"), 1), createCommand("админы", "адм", "Показывает администраторов", "", (msg, args, guild) -> {
 			reply(msg, FormatUtils.formatAdmins());
 		}), createCommand("заблокированные", "блок", "Показывает заблокированных пользователей", "", (msg, args, guild) -> {
@@ -109,7 +113,7 @@ public class LevelCommands implements ICommandList {
 				reply(msg, "Пожалуйсто укажите пользователя");
 				return;
 			}
-			Wrapper<User> usr = MiscUtils.tryGetUser(args[0]);
+			Wrapper<User> usr = Getters.getUser(args[0], Core.bot);
 			switch (usr.state) {
 				case EMPTY: {
 					reply(msg, "Не могу нати такого пользователя");

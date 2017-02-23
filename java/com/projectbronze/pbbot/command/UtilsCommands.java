@@ -14,12 +14,13 @@ import com.gt22.jdaenchacer.command.Command;
 import com.gt22.jdaenchacer.command.ICommandList;
 import com.gt22.jdaenchacer.data.AdvUser;
 import com.gt22.jdaenchacer.data.tags.DataStorage;
+import com.gt22.jdaenchacer.getters.Getters;
+import com.gt22.jdaenchacer.getters.Wrapper;
 import com.projectbronze.pbbot.Core;
 import com.projectbronze.pbbot.utils.FormatUtils;
 import com.projectbronze.pbbot.utils.MiscUtils;
-import com.projectbronze.pbbot.utils.Wrapper;
 
-import net.dv8tion.jda.entities.User;
+import net.dv8tion.jda.core.entities.User;
 
 public class UtilsCommands implements ICommandList {
 
@@ -62,7 +63,7 @@ public class UtilsCommands implements ICommandList {
 				Core.exit(Integer.parseInt(args[0]), null);
 			}
 		}, (msg, args, guild) -> reply(msg, "ТЫ МЕНЯ НЕ ПОБЕДИШЬ!!!"), 100), createCommand("пинг", "NONE", "Тестирует пинг до бота (Иногда бот вне времени)", "", (msg, args, guild) -> {
-			long msgTime = msg.getTime().atZoneSameInstant(ZoneId.ofOffset("UTC", ZoneOffset.ofHours(3))).toInstant().toEpochMilli();
+			long msgTime = msg.getCreationTime().atZoneSameInstant(ZoneId.ofOffset("UTC", ZoneOffset.ofHours(3))).toInstant().toEpochMilli();
 			long botTime = Calendar.getInstance().getTime().getTime();
 			SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss:SS");
 			reply(msg, "Pong, Сообщение получено в %s, отправленно в %s\nРазница в милисекундах: %s", format.format(botTime), format.format(msgTime), botTime - msgTime);
@@ -80,11 +81,11 @@ public class UtilsCommands implements ICommandList {
 					if (cm == null) {
 						reply(msg, "Не могу найти такой комманды, ты мне какую-то **~~дичь~~** лажу дал.");
 					} else {
-						msg.getChannel().sendMessage(FormatUtils.formatHelp(cm));
+						msg.getChannel().sendMessage(FormatUtils.formatHelp(cm)).queue();;
 					}
 				}
 			} else {
-				msg.getChannel().sendMessage(FormatUtils.formatHelp());
+				msg.getChannel().sendMessage(FormatUtils.formatHelp()).queue();;
 			}
 		}), createCommand("отошёл", "отш", "Бот мутит вас до следующего сообщения, если указан аргумент показывает информацию о том когда отощёл челове", "<време>|<--info Имя>", (msg, args, guild) -> {
 			boolean info = false;
@@ -109,7 +110,7 @@ public class UtilsCommands implements ICommandList {
 					int time;
 					usr.setData("dep", new Departure(MiscUtils.getTime(Departure.form), time = Integer.parseInt(args[0]), guild.getId()).toData());
 					reply(msg, String.format("Вы отошли на %s минут", time));
-					guild.getManager().mute(msg.getAuthor());
+					guild.getController().setMute(guild.getMember(usr.base), false);
 				} catch (NumberFormatException e) {
 					reply(msg, "Введено не корректное время");
 					return;
@@ -117,7 +118,7 @@ public class UtilsCommands implements ICommandList {
 			} else {
 				name = name.trim();
 				Departure dep;
-				Wrapper<User> w = MiscUtils.tryGetUser(name);
+				Wrapper<User> w = Getters.getUser(name, Core.bot);
 				switch (w.state) {
 					case SINGLE: {
 						dep = Departure.fromData(AdvUser.of(w.single.get()).getTag("dep"));

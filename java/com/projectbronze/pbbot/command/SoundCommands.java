@@ -1,6 +1,5 @@
 package com.projectbronze.pbbot.command;
 
-import static com.projectbronze.pbbot.Core.bot;
 import static com.projectbronze.pbbot.Core.reply;
 
 import java.io.File;
@@ -19,10 +18,11 @@ import com.projectbronze.pbbot.utils.FormatUtils;
 import com.projectbronze.pbbot.utils.MiscUtils;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
 
-import net.dv8tion.jda.entities.Message;
-import net.dv8tion.jda.entities.User;
-import net.dv8tion.jda.entities.VoiceChannel;
-import net.dv8tion.jda.managers.AudioManager;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.VoiceChannel;
+import net.dv8tion.jda.core.managers.AudioManager;
+
 
 public class SoundCommands implements ICommandList {
 
@@ -31,14 +31,14 @@ public class SoundCommands implements ICommandList {
 		//@formatter:off
 		return Arrays.asList(new Command[] { 
 			createCommand("комне", "фыв", "бот приходит к вам в канал", "[--hard]", (msg, args, guild) -> {
-				User sender = msg.getAuthor();
-				VoiceChannel userChannel = guild.getVoiceStatusOfUser(sender).getChannel();
-				AudioManager botman = bot.getAudioManager(guild);
+				Member sender = guild.getMember(msg.getAuthor());
+				VoiceChannel userChannel = sender.getVoiceState().getChannel();
+				AudioManager botman = guild.getAudioManager();
 				boolean hard = false;
 				if (args.length != 0) {
 					hard = args[0].equals("--hard") || args[0].equals("-h") || args[0].equals("-х");
 				}
-				if (!hard && userChannel == guild.getVoiceStatusOfUser(bot.getSelfInfo()).getChannel()) {
+				if (!hard && userChannel == guild.getMember(Core.bot.getSelfUser()).getVoiceState().getChannel()) {
 					reply(msg, "Я и так тут -_-");
 					return;
 				}

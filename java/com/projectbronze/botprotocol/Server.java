@@ -41,7 +41,7 @@ public class Server {
 					}
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				Core.err.warning("Unable to launch server: %s", e.getMessage());
 			}
 		}).start();
 	}

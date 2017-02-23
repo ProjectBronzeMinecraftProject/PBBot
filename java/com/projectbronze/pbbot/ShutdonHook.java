@@ -5,7 +5,7 @@ import java.util.List;
 import com.gt22.jdaenchacer.data.AdvGuild;
 import com.gt22.jdaenchacer.data.AdvUser;
 
-import net.dv8tion.jda.entities.Guild;
+import net.dv8tion.jda.core.entities.Guild;
 
 public class ShutdonHook
 {

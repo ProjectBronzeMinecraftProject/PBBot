@@ -9,7 +9,8 @@ import com.projectbronze.botprotocol.BotProtocol.Command.CommandAction;
 import com.projectbronze.pbbot.Core;
 import com.projectbronze.pbbot.utils.LevelUtils;
 
-import net.dv8tion.jda.entities.User;
+import net.dv8tion.jda.core.entities.User;
+
 
 public class BotProtocol {
 	

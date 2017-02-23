@@ -15,7 +15,8 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-import net.dv8tion.jda.entities.Guild;
+import net.dv8tion.jda.core.entities.Guild;
+
 
 public class MusicHandler {
 	private static final HashMap<String, GuildMusicManager> MANAGERS = new HashMap<>();

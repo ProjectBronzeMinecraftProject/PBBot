@@ -2,7 +2,8 @@ package com.projectbronze.botlauncher.api;
 
 import java.io.PrintStream;
 
-import net.dv8tion.jda.JDA;
+import net.dv8tion.jda.core.JDA;
+
 
 public interface IBot {
 	public void start(PrintStream infoStream);

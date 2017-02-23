@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import org.unbescape.html.HtmlEscape;
+
 import com.gt22.jdaenchacer.command.Command;
 import com.gt22.jdaenchacer.data.AdvUser;
 import com.projectbronze.pbbot.Core;
@@ -16,21 +18,23 @@ import com.projectbronze.pbbot.music.MusicHandler;
 import com.projectbronze.pbbot.utils.comporator.FileComporatorDir;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-import net.dv8tion.jda.entities.Guild;
-import net.dv8tion.jda.entities.User;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.User;
+
 
 public class FormatUtils
 {
 
 	public static String formatHelp()
 	{
-		String ret = "```";
+		String ret = "";
 		List<Command> commands = Core.commands.getCommands();
 		for (Command cm : commands)
 		{
 			ret += String.format("• %s,\n", cm.name);
 		}
-		return MiscUtils.uploadToPastebin(String.format("Команды:\n%s", ret + "```"), "Команды");
+		return MiscUtils.uploadToPastebin(String.format("Команды:\n%s", ret), "Команды");
 	}
 
 	public static String formatHelp(Command cm)
@@ -102,17 +106,18 @@ public class FormatUtils
 
 	public static String formatAdmins()
 	{
-		return "```Админы:\n" + Core.bot.getUsers().parallelStream().map(AdvUser::of).filter(u -> u.getLevel() > 0).sequential().sorted((u1, u2) -> Integer.compare(u2.getLevel(), u1.getLevel())).map(u -> "• " + u.base.getUsername() + ":" + u.getLevel()).reduce((s1, s2) -> s1 + "\n" + s2).orElse("нету") + "```";
+		return "```Админы:\n" + Core.bot.getUsers().parallelStream().map(AdvUser::of).filter(u -> u.getLevel() > 0).sequential().sorted((u1, u2) -> Integer.compare(u2.getLevel(), u1.getLevel())).map(u -> "• " + u.base.getName() + ":" + u.getLevel()).reduce((s1, s2) -> s1 + "\n" + s2).orElse("нету") + "```";
 	}
 
 	public static String fortmatBlocked()
 	{
-		return Core.bot.getUsers().parallelStream().map(AdvUser::of).filter(u -> u.getLevel() < 0).map(u -> "• " + u.base.getUsername()).reduce((s1, s2) -> s1 + "\n" + s2).orElse("Нету");
+		return Core.bot.getUsers().parallelStream().map(AdvUser::of).filter(u -> u.getLevel() < 0).map(u -> "• " + u.base.getName()).reduce((s1, s2) -> s1 + "\n" + s2).orElse("Нету");
 	}
 
 	public static String formatUser(User usr, Guild guild)
 	{
-		String nick = guild.getNicknameForUser(usr);
+		Member m = guild.getMember(usr);
+		String nick = m.getNickname();
 		int lvl = LevelUtils.getLevel(usr);
 		return String.format(
 				  "```Информация о: %s\n"
@@ -121,7 +126,7 @@ public class FormatUtils
 				+ "Определитель: %s\n"
 				+ "ID: %s\n"
 				+ "Статус: %s\n```",
-				usr.getUsername(), nick == null ? "Отсутствует" : nick, (lvl < 0 ? "Заблокированый" : lvl == 0 ? "Пользователь" : "Админ#" + lvl), usr.getDiscriminator(), usr.getId(), usr.getOnlineStatus());
+				usr.getName(), nick == null ? "Отсутствует" : nick, (lvl < 0 ? "Заблокированый" : lvl == 0 ? "Пользователь" : "Админ#" + lvl), usr.getDiscriminator(), usr.getId(), m.getOnlineStatus());
 	}
 
 	public static String formatBash(Random r)
@@ -154,7 +159,7 @@ public class FormatUtils
 
 	public static String formatHtmlChars(String s)
 	{
-		return s.replace("&amp;", "").replaceAll("(<br>|<br />)", "\n").replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"").replaceAll("&#039;", "'");
+		return HtmlEscape.unescapeHtml(s);
 	}
 
 	
