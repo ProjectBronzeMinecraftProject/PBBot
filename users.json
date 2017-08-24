@@ -1,0 +1,42 @@
+[
+	{
+		"name": "TheSystem",
+		"level": 2147483647,
+		"discord": "222052803013509131",
+		"ssn": 0
+	},
+	{
+		"name": "Admin",
+		"level": 2147483646,
+		"discord": "123471451750793219",
+		"vka": "e9172d69-2ad2-404b-96a8-02c79febad85"
+	},
+	{
+		"name": "Analog Interface (TheEvilRoot)",
+		"level": 100,
+		"discord": "290145410322923520"
+	},
+	{
+		"name": "Analog Interface (Sizon)",
+		"level": 70,
+		"discord": "282455445254307840"
+	},
+	{
+		"name": "Analog Interface (Smila)",
+		"level": 70,
+		"discord": "154004527941419008"
+	},
+	{
+		"name": "Analog Interface (RednOll)",
+		"level": 70,
+		"discord": "122768445409329154"
+	},
+	{
+		"name": "Competing System (Genesis)",
+		"discord": "123591822579597315"
+	},
+	{
+		"name": "Samaritan",
+		"discord": "346090460902588421"
+	}
+]
