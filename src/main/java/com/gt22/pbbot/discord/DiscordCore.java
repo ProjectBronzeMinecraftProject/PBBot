@@ -23,6 +23,7 @@ public class DiscordCore implements ITMBModule {
 	static JDA bot;
 	private static CommandClient commands;
 	private static SimpleLog LOG = SimpleLog.getLog("TMBot#Discord");
+
 	public void init() throws LoginException, RateLimitedException, InterruptedException {
 		LOG.setLevel(SimpleLog.Level.ALL);
 		buildCommandClient();
@@ -40,6 +41,7 @@ public class DiscordCore implements ITMBModule {
 			.addCommands(new QuoteCommands().init())
 			.addCommand(new AuthCommand())
 			.addCommands(new ClassificationCommands().init())
+			.addCommands(new MusicCommands().init())
 			.useHelpBuilder(false)
 			.setEmojis("<:asset:230288765724131329>", "<:irrelevant_threat:340157734248775680>", "<:relevant_threat:340157956286840844>")
 			.build();

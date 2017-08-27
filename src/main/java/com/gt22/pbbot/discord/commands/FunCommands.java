@@ -1,13 +1,15 @@
 package com.gt22.pbbot.discord.commands;
 
+import com.gt22.botrouter.api.misc.MiscUtils;
 import com.gt22.pbbot.Core;
 import com.gt22.pbbot.discord.DiscordCore;
 import com.gt22.pbbot.discord.commands.utils.ICommandList;
 import com.gt22.pbbot.discord.misc.AdvancedCategory;
 import com.gt22.pbbot.discord.music.MusicHandler;
 import com.gt22.pbbot.utils.GifSequenceWriter;
-import com.gt22.pbbot.utils.MiscUtils;
 import com.gt22.randomutils.Instances;
+import com.gt22.randomutils.utils.ArrayUtils;
+import com.gt22.randomutils.utils.JoinUtils;
 import com.jagrosh.jdautilities.commandclient.Command;
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.lambda.Unchecked;
@@ -123,7 +125,7 @@ public class FunCommands implements ICommandList {
 						if (type) {
 							generateSamaritanTypingMessage(words, samaritan, textColor, gifWriter);
 						} else {
-							MiscUtils.ArrayUtils.forEach(words, Unchecked.consumer(word -> gifWriter.writeToSequence(createSamaritanMessage(word, samaritan, textColor))));
+							ArrayUtils.forEach(words, Unchecked.consumer(word -> gifWriter.writeToSequence(createSamaritanMessage(word, samaritan, textColor))));
 							gifWriter.writeToSequence(createSamaritanMessage("  ", samaritan, textColor));
 						}
 						gifWriter.close();
@@ -187,13 +189,14 @@ public class FunCommands implements ICommandList {
 				command("root", "Everyone dies alone", e -> {
 					MusicHandler.add(VOICE_DIR.resolve("root.mp3"), e.getGuild(), false, false);
 					e.reactSuccess();
-				}).setHidden().build()
+				}).setHidden().build(),
+			command("ram", "8,960 GB of Ram!", e -> e.reply("https://pp.userapi.com/c639127/v639127597/3ad6a/Y7f6SdWyC2M.jpg")).setHidden().build()
 		};
 	}
 
 	private void createMergedMp3(List<String> paths) throws IOException, InterruptedException {
 		Process p = new ProcessBuilder("ffmpeg", "-i",
-				MiscUtils.JoinUtils.join(paths, "|")
+				JoinUtils.join(paths, "|")
 						.map(f -> String.format("concat:%s", f))
 						.orElseThrow(() -> new IllegalArgumentException("At least one path must be provided")),
 				"-c", "copy", "tmp_message.mp3")
@@ -207,7 +210,7 @@ public class FunCommands implements ICommandList {
 	private void generateSamaritanTypingMessage(String[] words, BufferedImage samaritan, Color textColor, GifSequenceWriter out) throws IOException {
 		out.writeToSequence(createSamaritanMessage("", samaritan, textColor));
 		StringBuilder builder = new StringBuilder();
-		MiscUtils.ArrayUtils.forEach(words, Unchecked.consumer(word -> {
+		ArrayUtils.forEach(words, Unchecked.consumer(word -> {
 			out.writeToSequence(createSamaritanMessage(builder.append(word).toString(), samaritan, textColor));
 			builder.append(' ');
 		}));

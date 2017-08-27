@@ -17,6 +17,8 @@ task builddep(type: Jar, dependsOn: classes) {
     with jar 
 }
 
+sourceSets.main.java = "src/main/java"
+
 dependencies {
     compile 'com.jagrosh:JDA-Utilities:1.3'
     compile 'net.dv8tion:JDA:3.2.0_242'

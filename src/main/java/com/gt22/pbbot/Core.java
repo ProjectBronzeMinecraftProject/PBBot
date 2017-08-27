@@ -2,10 +2,12 @@ package com.gt22.pbbot;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.gt22.botrouter.api.misc.MiscUtils;
+import com.gt22.pbbot.discord.music.MusicHandler;
 import com.gt22.pbbot.interfaces.ITMBModule;
 import com.gt22.pbbot.utils.ConfigUtils;
-import com.gt22.pbbot.utils.MiscUtils;
 import com.gt22.randomutils.Instances;
+import com.gt22.randomutils.utils.ArrayUtils;
 import net.dv8tion.jda.core.utils.SimpleLog;
 import org.apache.http.client.methods.HttpUriRequest;
 
@@ -14,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,11 +31,13 @@ public class Core {
 		for(String s : args) {
 			if(s.equals("-d")) {
 				SimpleLog.LEVEL = SimpleLog.Level.ALL;
+			} else if (s.startsWith("-md:")) {
+				MusicHandler.musicDir = Paths.get(s.substring(s.indexOf(':') + 1));
 			}
 		}
 		System.setProperty("org.slf4j.simpleLogger.logFile", "System.out"); //Redirect slf4j-simple to System.out from System.err
 		config = ConfigUtils.loadConfig(Config.class, "config.json", new JsonObject());
-		MiscUtils.ArrayUtils.forEach(config.MODULES, module -> {
+		ArrayUtils.forEach(config.MODULES, module -> {
 			try {
 				Class<?> clazz = Class.forName(module);
 				if(ITMBModule.class.isAssignableFrom(clazz)) {
