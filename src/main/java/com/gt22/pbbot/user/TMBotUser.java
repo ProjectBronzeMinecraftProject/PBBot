@@ -56,12 +56,14 @@ public class TMBotUser {
 				JDA bot = DiscordCore.getBot();
 				if (bot != null) {
 					User discordUser = bot.getUserById(data.get("DISCORD_ID").getAsString());
-					JsonObject discordData = data.getAsJsonObject("discord");
-					if (discordData == null) {
-						discordData = new JsonObject();
-						data.add("discord", discordData);
+					if (discordUser != null) {
+						JsonObject discordData = data.getAsJsonObject("discord");
+						if (discordData == null) {
+							discordData = new JsonObject();
+							data.add("discord", discordData);
+						}
+						discord = new DiscordUser(this, discordUser, discordData);
 					}
-					discord = new DiscordUser(this, discordUser, discordData);
 				}
 			}
 			if (data.has("CLASSIFICATION")) {
@@ -171,10 +173,10 @@ public class TMBotUser {
 	public ManualFuture<String> getAvatarWithClassUrl(Classification classification) throws IOException {
 		ManualFuture<String> ret = new ManualFuture<>();
 		Instances.getExecutor().submit(Unchecked.runnable(() -> ret.complete(EmbedUtils.convertImgToURL(Unchecked.supplier(() -> {
-			BufferedImage avatar = ImageUtils.readImg(discord.getEffectiveAvatarUrl()).get();
+			BufferedImage avatar = discord == null ? new BufferedImage(200, 200, BufferedImage.TYPE_INT_ARGB) : ImageUtils.readImg(discord.getEffectiveAvatarUrl()).get();
 			BufferedImage frame = ImageUtils.readImg(classification.getImg(avatar == null ? 200 : avatar.getWidth())).get();
 			return ImageUtils.mergeImages(avatar, frame);
-		}), discord.getEffectiveAvatarUrl() + ":;:;:" + classification.getName()))));
+		}), discord == null ? "EMPTY" : discord.getEffectiveAvatarUrl() + ":;:;:" + classification.getName()))));
 		return ret;
 	}
 

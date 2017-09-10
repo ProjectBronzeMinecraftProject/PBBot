@@ -1,6 +1,7 @@
 package com.gt22.pbbot.discord.commands;
 
 import com.gt22.pbbot.discord.DiscordCore;
+import com.gt22.pbbot.discord.DiscordUser;
 import com.gt22.pbbot.discord.commands.utils.ICommandList;
 import com.gt22.pbbot.discord.misc.AdvancedCategory;
 import com.gt22.pbbot.discord.utils.EmbedUtils;
@@ -48,29 +49,33 @@ public class ClassificationCommands implements ICommandList {
 					boolean shouldContact = usr.getName().equalsIgnoreCase("admin") || usr.getName().equalsIgnoreCase("thesystem");
 					e.reply(EmbedUtils.create(0xFF0000, "No, no, no", "Monitor request denied" + (shouldContact ? "\nContacting Admin" : ""), Classification.UNKNOWN.getImg()));
 					e.reactWarning();
-					if(shouldContact) {
+					if (shouldContact) {
 						Instances.getExecutor().submit(Unchecked.runnable(() -> DiscordCore.contactAdmin((EmbedUtils.create(0xFFFF00, "Monitor attempt detected", String.format("User '%s' tried to monitor %s", author.getName(), usr.getName()), author.getAvatarWithClassUrl(Classification.RELEVANT_THREAT).get())))));
 					}
 					return;
 				}
-				Member m = e.getGuild().getMember(usr.getDiscordUser().getBaseUser());
+
 				Classification cls = usr.getClassification();
 				Instances.getExecutor().submit(() -> {
 					try {
-						e.reply(new EmbedBuilder()
+						EmbedBuilder rep = new EmbedBuilder()
 							.setTitle("Info about " + usr.getName(), null)
-							.addField("Classification",cls.getName(), true)
+							.addField("Classification", cls.getName(), true)
 							.addField("Access level", Integer.toString(usr.getLevel()), true)
 							.addField("SSN", usr.getSSN().getSSNString(targetLevel == ownLevel), true)
-							.addField("Discord name", m.getEffectiveName(), true)
-							.addField("Discord id", usr.getDiscordUser().getId(), true)
-							.addField("Voice Interface Location", m.getVoiceState().inVoiceChannel() ? m.getVoiceState().getChannel().getName() : "None", true)
-							.addField("Online status", m.getOnlineStatus().getKey().replace("dnd", "Do not disturb"), true)
-							.addField("Roles", m.getRoles().stream().map(Role::getName).reduce((s1, s2) -> s1 + '\n' + s2).orElse("None"), false)
 							.addField("Aliases", usr.getAllAliases().stream().reduce((s1, s2) -> s1 + '\n' + s2).orElse("None"), false)
 							.setColor(cls.getColor())
-							.setThumbnail(usr.getAvatarWithClassUrl().get())
-							.build());
+							.setThumbnail(usr.getAvatarWithClassUrl().get());
+						DiscordUser dusr = usr.getDiscordUser();
+						if (dusr != null) {
+							Member m = e.getGuild().getMember(usr.getDiscordUser().getBaseUser());
+							rep.addField("Discord name", m.getEffectiveName(), true)
+								.addField("Discord id", usr.getDiscordUser().getId(), true)
+								.addField("Voice Interface Location", m.getVoiceState().inVoiceChannel() ? m.getVoiceState().getChannel().getName() : "None", true)
+								.addField("Online status", m.getOnlineStatus().getKey().replace("dnd", "Do not disturb"), true)
+								.addField("Roles", m.getRoles().stream().map(Role::getName).reduce((s1, s2) -> s1 + '\n' + s2).orElse("None"), false);
+						}
+						e.reply(rep.build());
 						e.reactSuccess();
 					} catch (IOException | InterruptedException e1) {
 						e1.printStackTrace();

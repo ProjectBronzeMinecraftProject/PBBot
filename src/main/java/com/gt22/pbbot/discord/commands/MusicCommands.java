@@ -1,6 +1,5 @@
 package com.gt22.pbbot.discord.commands;
 
-import com.gt22.botrouter.api.misc.MiscUtils;
 import com.gt22.pbbot.discord.commands.utils.ICommandList;
 import com.gt22.pbbot.discord.misc.AdvancedCategory;
 import com.gt22.pbbot.discord.music.MusicHandler;
@@ -8,17 +7,18 @@ import com.gt22.pbbot.discord.utils.EmbedUtils;
 import com.gt22.randomutils.utils.JoinUtils;
 import com.jagrosh.jdautilities.commandclient.Command;
 import com.jagrosh.jdautilities.commandclient.CommandEvent;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.core.entities.Guild;
 
 import java.awt.*;
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.net.URL;
-import java.nio.file.Paths;
 
 public class MusicCommands implements ICommandList {
 
-	public static final AdvancedCategory cat = new AdvancedCategory("Music", new Color(0xAFEBF3), "http://52.48.142.75/ai.jpg");
+	public static final AdvancedCategory cat = new AdvancedCategory("Music", new Color(0xAFEBF3), "http://52.48.142.75/images/an.png");
 
 	@Override
 	public AdvancedCategory getCategory() {
@@ -45,6 +45,7 @@ public class MusicCommands implements ICommandList {
 						case "-r":
 						case "--allow-repeat": {
 							noRepeat = false;
+							break;
 						}
 						case "*": {
 							try {
@@ -67,7 +68,6 @@ public class MusicCommands implements ICommandList {
 				}
 				args = JoinUtils.join(resultArgs, " ").orElse("");
 				MusicHandler.Return ret;
-				System.out.println(noRepeat);
 				if (args.isEmpty()) {
 					ret = MusicHandler.addXTimes(MusicHandler.musicDir, count, noRepeat, all, e.getGuild());
 				} else if (args.startsWith("http")) {
@@ -97,7 +97,7 @@ public class MusicCommands implements ICommandList {
 						break;
 					}
 				}
-			}).setArguments("(%songName%|%songUrl%) [--all] [* i%count%]").build(),
+			}).setOnDenied((i, e) -> reply(e, 0xFF0000, "You shall not play!", "", cat.getImg())).setRequiredPermission(70).setArguments("(%songName%|%songUrl%) [--all] [* i%count%]").build(),
 			command("pause", "Pause playing", e -> {
 				Guild g = e.getGuild();
 				if(!MusicHandler.isPaused(g) && MusicHandler.playlistSize(g) > 0) {
@@ -127,12 +127,12 @@ public class MusicCommands implements ICommandList {
 					reply(e, 0xFF0000, "Nothing playing", "", cat.getImg());
 					e.reactWarning();
 				}
-			}).setAliases("clear").build(),
+			}).setOnDenied((i, e) -> reply(e, 0xFF0000, "You shall not clear!", "", cat.getImg())).setRequiredPermission(70).setAliases("clear").build(),
 			command("skip", "Skips specified song", e -> {
 				String args = e.getArgs();
 				if(args.isEmpty()) {
 					if(MusicHandler.playlistSize(e.getGuild()) > 0) {
-						MusicHandler.skip(1, e.getGuild());
+						MusicHandler.skip(0, e.getGuild());
 					} else {
 						reply(e, 0xFF0000,"Playlist empty", "", cat.getImg());
 						e.reactWarning();
@@ -140,7 +140,7 @@ public class MusicCommands implements ICommandList {
 					}
 				} else {
 					int n = Integer.parseInt(args);
-					if(MusicHandler.playlistSize(e.getGuild()) >= n) {
+					if(MusicHandler.playlistSize(e.getGuild()) > n) {
 						MusicHandler.skip(n, e.getGuild());
 					} else {
 						reply(e, 0xFF0000, "No such song in playlist", "", cat.getImg());
@@ -150,7 +150,7 @@ public class MusicCommands implements ICommandList {
 				}
 				reply(e, 0x00FF00, "Skipped", "", cat.getImg());
 				e.reactSuccess();
-			}).setArguments("[i%num%]").build(),
+			}).setOnDenied((i, e) -> reply(e, 0xFF0000, "You shall not skip!", "", cat.getImg())).setRequiredPermission(70).setArguments("[i%num%]").build(),
 			command("playlist", "Shows playlist", e -> {
 				Guild g = e.getGuild();
 				StringBuilder playlistBuilder = new StringBuilder();
@@ -161,8 +161,12 @@ public class MusicCommands implements ICommandList {
 					return;
 				}
 				int playlistNum = 1;
-				for(int i = 0; i < size; i++) {
-					playlistBuilder.append(i + 1).append(": ").append(MusicHandler.playlistGet(i, g).getIdentifier().replace('\\', '/').substring("Music/".length())).append('\n');
+				//Manually add first element to add percents
+				AudioTrack current = MusicHandler.playlistGet(0, g);
+				addPlaylistElement(playlistBuilder, 1, current);
+				playlistBuilder.append((current.getPosition() * 100) / current.getDuration()).append('%');
+				for(int i = 1; i < size; i++) {
+					addPlaylistElement(playlistBuilder.append('\n'), i + 1, MusicHandler.playlistGet(i, g));
 					if(playlistBuilder.length() > 1800) {
 						sendPlaylist(playlistBuilder.toString(), playlistNum++, e);
 						playlistBuilder = new StringBuilder();
@@ -174,6 +178,12 @@ public class MusicCommands implements ICommandList {
 				e.reactSuccess();
 			}).build()
 		};
+	}
+
+	private void addPlaylistElement(StringBuilder playlist, int pos, AudioTrack track) {
+		String name = track.getIdentifier().replace(File.separatorChar, '/');
+		int start = name.indexOf('/'), end = name.indexOf('.');
+		playlist.append(pos).append(": ").append(name.substring(start == -1 ? 0 : start + 1, end == -1 ? name.length() : end));
 	}
 
 	private void sendPlaylist(String playlist, int part, CommandEvent e) {

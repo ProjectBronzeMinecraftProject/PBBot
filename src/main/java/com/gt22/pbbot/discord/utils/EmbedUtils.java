@@ -42,8 +42,7 @@ public class EmbedUtils {
 		BufferedReader check = new BufferedReader(new InputStreamReader(new JavaHttpRequestBuilder(Core.getConfig().IMAGE_DB_MANAGER + "?mode=check&name=" + name).build().getInputStream()));
 		String res = check.readLine();
 		check.close();
-		//if (res.equals("false")) {
-		if (true) {
+		if (res.equals("false")) {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			Base64.OutputStream b64 = new Base64.OutputStream(os);
 			ImageIO.write(img.get(), "png", b64);

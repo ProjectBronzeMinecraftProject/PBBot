@@ -71,6 +71,7 @@ public class QuoteCommands implements ICommandList {
 							if (args.length != 2) {
 								reply(e, 0xFF0000, "Invalid args", "Args should be '%author% %quote%'", cat.getImg());
 								e.reactError();
+								return;
 							}
 							try {
 								JsonObject r = Instances.getParser().parse((new InputStreamReader(new JavaHttpRequestBuilder(Core.getConfig().QUOTER_URL)

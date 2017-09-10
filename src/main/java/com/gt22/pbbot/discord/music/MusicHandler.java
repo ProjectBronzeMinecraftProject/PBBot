@@ -1,7 +1,9 @@
 package com.gt22.pbbot.discord.music;
 
+import com.gt22.pbbot.discord.DiscordCore;
 import com.gt22.randomutils.Instances;
 import com.gt22.randomutils.utils.FileUtils;
+import com.sedmelluq.discord.lavaplayer.player.AudioConfiguration;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
@@ -36,6 +38,8 @@ public class MusicHandler {
 
 	static {
 		PLAYER_MANAGER = new DefaultAudioPlayerManager();
+		PLAYER_MANAGER.getConfiguration().setOpusEncodingQuality(10);
+		PLAYER_MANAGER.getConfiguration().setResamplingQuality(AudioConfiguration.ResamplingQuality.HIGH);
 		AudioSourceManagers.registerLocalSource(PLAYER_MANAGER);
 		AudioSourceManagers.registerRemoteSources(PLAYER_MANAGER);
 	}
@@ -47,7 +51,6 @@ public class MusicHandler {
 			MANAGERS.put(id, m = new GuildMusicManager(PLAYER_MANAGER));
 		}
 		g.getAudioManager().setSendingHandler(m.getSendHandler());
-		m.player.setVolume(200);
 		return m;
 	}
 
@@ -86,19 +89,19 @@ public class MusicHandler {
 
 	public static Return add(Path file, Guild guild, boolean noRepeat, boolean all) throws IOException {
 		if (all && Files.isDirectory(file)) {
-				final Return[] ret = {Return.OK};
-				Files.list(file).forEach(Unchecked.consumer(f -> {
-					Return r;
-					if (Files.isDirectory(f)) {
-						r = add(f, guild, noRepeat, true);
-					} else {
-						r = load(guild, f.toString(), true, noRepeat);
-					}
-					if (r != Return.OK) {
-						ret[0] = r;
-					}
-				}));
-				return ret[0];
+			final Return[] ret = {Return.OK};
+			Files.list(file).forEach(Unchecked.consumer(f -> {
+				Return r;
+				if (Files.isDirectory(f)) {
+					r = add(f, guild, noRepeat, true);
+				} else {
+					r = load(guild, f.toString(), true, noRepeat);
+				}
+				if (r != Return.OK) {
+					ret[0] = r;
+				}
+			}));
+			return ret[0];
 		} else {
 			if (Files.isDirectory(file)) {
 				file = FileUtils.getRandomFile(file);
@@ -169,6 +172,8 @@ public class MusicHandler {
 			if (e.getMessage().startsWith("CANNOTADD")) {
 				return Return.CANNOT_ADD;
 			}
+		} catch (IllegalStateException e) {
+			DiscordCore.getDiscordLog().warn(String.format("Error when loading %s: %s", name, e.getLocalizedMessage()));
 		}
 		return Return.OK;
 	}
@@ -190,7 +195,7 @@ public class MusicHandler {
 		if (--i <= 0) {
 			m.scheduler.nextTrack();
 		} else {
-			m.scheduler.skipTack(i);
+			m.scheduler.skipTack(i - 1);
 		}
 	}
 

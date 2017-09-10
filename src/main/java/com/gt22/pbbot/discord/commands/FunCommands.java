@@ -35,11 +35,11 @@ import java.util.regex.Pattern;
 public class FunCommands implements ICommandList {
 
 	public static final AdvancedCategory cat = new AdvancedCategory("Fun", new Color(0xAFEB73), "https://static1.varagesale.com/assets/emoji/grinning-cbe888b5b2231b7149ed5f635a9af5e13873a0cb608e0d001dcc5c6eaa635dca.png");
+	public static final Path VOICE_DIR = Paths.get("voice");
 	private static final FacePart[] parts = new FacePart[]{new FacePart("<", ">"), new FacePart("(", ")"), new FacePart("-", "="), new FacePart("=", "="), new FacePart("=", "-")};
 	private static final BufferedImage SAMARITAN_BLACK;
 	private static final BufferedImage SAMARITAN_WHITE;
 	private static final Font SAMARITAN_FONT = new Font("MagdaCleanMono", Font.PLAIN, 54);
-	private static final Path VOICE_DIR = Paths.get("voice");
 	private static final Pattern SAY_ARGS = Pattern.compile("(?:-r:(\\d+) )?(.+)");
 	private static final HashMap<Integer, Character> NUMBERS_MAP = new HashMap<>();
 
@@ -125,7 +125,7 @@ public class FunCommands implements ICommandList {
 						if (type) {
 							generateSamaritanTypingMessage(words, samaritan, textColor, gifWriter);
 						} else {
-							ArrayUtils.forEach(words, Unchecked.consumer(word -> gifWriter.writeToSequence(createSamaritanMessage(word, samaritan, textColor))));
+							ArrayUtils.forEach(words, Unchecked.consumer(word -> gifWriter.writeToSequence(createSamaritanMessage(word.replace("%SPACE%", " "), samaritan, textColor))));
 							gifWriter.writeToSequence(createSamaritanMessage("  ", samaritan, textColor));
 						}
 						gifWriter.close();
@@ -186,11 +186,6 @@ public class FunCommands implements ICommandList {
 					MusicHandler.add(tmpMsg, e.getGuild(), false, false);
 					e.reactSuccess();
 				}).setArguments("[-r:i%count%] %message%").build(),
-				command("root", "Everyone dies alone", e -> {
-					MusicHandler.add(VOICE_DIR.resolve("root.mp3"), e.getGuild(), false, false);
-					e.reactSuccess();
-				}).setHidden().build(),
-			command("ram", "8,960 GB of Ram!", e -> e.reply("https://pp.userapi.com/c639127/v639127597/3ad6a/Y7f6SdWyC2M.jpg")).setHidden().build()
 		};
 	}
 
@@ -211,7 +206,7 @@ public class FunCommands implements ICommandList {
 		out.writeToSequence(createSamaritanMessage("", samaritan, textColor));
 		StringBuilder builder = new StringBuilder();
 		ArrayUtils.forEach(words, Unchecked.consumer(word -> {
-			out.writeToSequence(createSamaritanMessage(builder.append(word).toString(), samaritan, textColor));
+			out.writeToSequence(createSamaritanMessage(builder.append(word.replace("%SPACE%", " ")).toString(), samaritan, textColor));
 			builder.append(' ');
 		}));
 	}

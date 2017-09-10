@@ -44,7 +44,8 @@ public class TrackScheduler extends AudioEventAdapter {
 	}
 
 	public boolean contains(AudioTrack track) {
-		return queue.parallelStream().anyMatch(t -> t.getIdentifier().equals(track.getIdentifier()));
+		String name = track.getIdentifier();
+		return player.getPlayingTrack() != null && player.getPlayingTrack().getIdentifier().equals(name) || queue.parallelStream().anyMatch(t -> t.getIdentifier().equals(name));
 	}
 
 	public boolean addIfNotContains(AudioTrack track) {
